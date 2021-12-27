@@ -56,16 +56,5 @@ func (c *Client) delete(path string, body io.Reader) (*http.Response, error) {
 
 func (c *Client) do(req *http.Request) (*http.Response, error) {
 	req.SetBasicAuth(c.username, c.password)
-	return c.httpClient.Do(req)
-}
-
-// TODO
-type Result struct{}
-func results(resp *http.Response) (Result, error) {
-	defer resp.Body.Close()
-	var results []Result
-	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
-		return Result{}, err
-	}
-	return Result{}, nil
+	return c.Do(req)
 }

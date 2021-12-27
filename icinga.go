@@ -9,7 +9,7 @@ type Client struct {
 	host       string
 	username   string
 	password   string
-	httpClient *http.Client
+	*http.Client
 }
 
 func Dial(host, username, password string, client *http.Client) (*Client, error) {

@@ -43,7 +43,6 @@ func (c *Client) post(path string, body io.Reader) (*http.Response, error) {
 	return c.do(req)
 }
 
-
 func (c *Client) put(path string, body io.Reader) (*http.Response, error) {
 	req, err := newRequest(http.MethodPut, c.host, path, body)
 	if err != nil {

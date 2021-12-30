@@ -6,9 +6,9 @@ import (
 )
 
 type Client struct {
-	host       string
-	username   string
-	password   string
+	host     string
+	username string
+	password string
 	*http.Client
 }
 

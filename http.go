@@ -1,7 +1,6 @@
 package icinga
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 )
@@ -15,8 +14,15 @@ func newRequest(method, host, path string, body io.Reader) (*http.Request, error
 		return nil, err
 	}
 	switch req.Method {
+	case http.MethodGet:
+		break
+	case http.MethodDelete:
+		req.Header.Set("Accept", "application/json")
 	case http.MethodPost, http.MethodPut:
+		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
+	default:
+		return nil, fmt.Errorf("new request: unsupported method %s", req.Method)
 	}
 	return req, nil
 }

@@ -1,6 +1,8 @@
 package icinga
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,7 +16,7 @@ type results struct {
 }
 
 type result struct {
-	Attrs  interface{}
+	Attrs  map[string]interface{}
 	Code   int
 	Errors []string
 	Name   string
@@ -23,16 +25,21 @@ type result struct {
 
 var ErrNoObject = errors.New("no such object")
 
-func (res results) Error() string {
-	var s []string
-	for _, r := range res.Results {
-		s = append(s, r.Error())
+func (res results) Err() error {
+	if len(res.Results) == 0 {
+		return nil
 	}
-	return strings.Join(s, ", ")
-}
-
-func (r result) Error() string {
-	return strings.Join(r.Errors, ", ")
+	var errs []string
+	for _, r := range res.Results {
+		if len(r.Errors) == 0 {
+			continue
+		}
+		errs = append(errs, strings.Join(r.Errors, ", "))
+	}
+	if len(errs) == 0 {
+		return nil
+	}
+	return errors.New(strings.Join(errs, ", "))
 }
 
 func newRequest(method, host, path string, body io.Reader) (*http.Request, error) {
@@ -71,18 +78,30 @@ func (c *Client) post(path string, body io.Reader) (*http.Response, error) {
 	return c.do(req)
 }
 
-func (c *Client) put(path string, body io.Reader) (*http.Response, error) {
+func (c *Client) put(path string, body io.Reader) error {
 	req, err := newRequest(http.MethodPut, c.host, path, body)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return c.do(req)
+	resp, err := c.do(req)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+	defer resp.Body.Close()
+	var results results
+	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
+		return fmt.Errorf("decode response: %w", err)
+	}
+	return results.Err()
 }
 
 func (c *Client) delete(path string) error {
 	req, err := newRequest(http.MethodDelete, c.host, path, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	resp, err := c.do(req)
 	if err != nil {
@@ -98,7 +117,7 @@ func (c *Client) delete(path string) error {
 	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
 		return fmt.Errorf("decode response: %w", err)
 	}
-	return results
+	return results.Err()
 }
 
 func (c *Client) do(req *http.Request) (*http.Response, error) {

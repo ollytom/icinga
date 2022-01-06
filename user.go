@@ -8,6 +8,8 @@ import (
 	"net/http"
 )
 
+// User represents a User object.
+// Note that this is different from an ApiUser.
 type User struct {
 	Name   string
 	Email  string
@@ -47,26 +49,21 @@ func (c *Client) LookupUser(name string) (User, error) {
 	return testUser, nil
 }
 
+// CreateUser creates the User u identified by u.Name.
+// An error is returned if the User already exists or on any other error.
 func (c *Client) CreateUser(u User) error {
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(u); err != nil {
 		return err
 	}
-	resp, err := c.put("/objects/users/"+u.Name, buf)
-	if err != nil {
+	if err := c.put("/objects/users/"+u.Name, buf); err != nil {
 		return fmt.Errorf("create %s: %w", u.Name, err)
 	}
-	if resp.StatusCode == http.StatusOK {
-		return nil
-	}
-	defer resp.Body.Close()
-	var results results
-	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
-		return fmt.Errorf("create %s: decode response: %w", u.Name, err)
-	}
-	return fmt.Errorf("create %s: %w", u.Name, results)
+	return nil
 }
 
+// DeleteUser deletes the User identified by name.
+// ErrNoUser is returned if the User doesn't exist.
 func (c *Client) DeleteUser(name string) error {
 	if err := c.delete("/objects/users/" + name); err != nil {
 		return fmt.Errorf("delete user %s: %w", name, err)

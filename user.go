@@ -49,15 +49,15 @@ func (c *Client) LookupUser(name string) (User, error) {
 	return testUser, nil
 }
 
-// CreateUser creates the User u identified by u.Name.
+// CreateUser creates user.
 // An error is returned if the User already exists or on any other error.
-func (c *Client) CreateUser(u User) error {
+func (c *Client) CreateUser(user User) error {
 	buf := &bytes.Buffer{}
-	if err := json.NewEncoder(buf).Encode(u); err != nil {
+	if err := json.NewEncoder(buf).Encode(user); err != nil {
 		return err
 	}
-	if err := c.put("/objects/users/"+u.Name, buf); err != nil {
-		return fmt.Errorf("create %s: %w", u.Name, err)
+	if err := c.put("/objects/users/"+user.Name, buf); err != nil {
+		return fmt.Errorf("create %s: %w", user.Name, err)
 	}
 	return nil
 }

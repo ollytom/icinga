@@ -28,6 +28,21 @@ import (
 	"net/http"
 )
 
+type State int
+
+const (
+	StateOK State = 0 + iota
+	StateWarning
+	StateCritical
+	StateUnknown
+)
+
+const (
+	HostUp State = 0 + iota
+	HostDown
+	HostUnknown
+)
+
 // A Client represents a client connection to the Icinga2 HTTP API.
 // It should be created using Dial.
 // Since Client wraps http.Client, standard methods such as Get and

@@ -63,7 +63,7 @@ func newRequest(method, host, path string, body io.Reader) (*http.Request, error
 }
 
 func (c *Client) get(path string) (*http.Response, error) {
-	req, err := newRequest(http.MethodGet, c.host, path, nil)
+	req, err := newRequest(http.MethodGet, c.addr, path, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (c *Client) get(path string) (*http.Response, error) {
 }
 
 func (c *Client) post(path string, body io.Reader) (*http.Response, error) {
-	req, err := newRequest(http.MethodPost, c.host, path, body)
+	req, err := newRequest(http.MethodPost, c.addr, path, body)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (c *Client) post(path string, body io.Reader) (*http.Response, error) {
 }
 
 func (c *Client) put(path string, body io.Reader) error {
-	req, err := newRequest(http.MethodPut, c.host, path, body)
+	req, err := newRequest(http.MethodPut, c.addr, path, body)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (c *Client) put(path string, body io.Reader) error {
 }
 
 func (c *Client) delete(path string) error {
-	req, err := newRequest(http.MethodDelete, c.host, path, nil)
+	req, err := newRequest(http.MethodDelete, c.addr, path, nil)
 	if err != nil {
 		return err
 	}

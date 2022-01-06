@@ -7,7 +7,7 @@
 //	if err != nil {
 //		// handle error
 //	}
-//	host, err := icinga.LookupHost("myserver.example.com")
+//	host, err := client.LookupHost("myserver.example.com")
 //	if err != nil {
 //		// handle error
 //	}

@@ -25,6 +25,28 @@ type result struct {
 
 var ErrNoObject = errors.New("no such object")
 
+// NewRequest returns an authenticated HTTP request with appropriate header
+// for sending to an Icinga2 server.
+func NewRequest(method, url, username, password string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	switch req.Method {
+	case http.MethodGet:
+		break
+	case http.MethodDelete:
+		req.Header.Set("Accept", "application/json")
+	case http.MethodPost, http.MethodPut:
+		req.Header.Set("Accept", "application/json")
+		req.Header.Set("Content-Type", "application/json")
+	default:
+		return nil, fmt.Errorf("new request: unsupported method %s", req.Method)
+	}
+	req.SetBasicAuth(username, password)
+	return req, nil
+}
+
 func (res results) Err() error {
 	if len(res.Results) == 0 {
 		return nil
@@ -42,48 +64,31 @@ func (res results) Err() error {
 	return errors.New(strings.Join(errs, ", "))
 }
 
-func newRequest(method, host, path string, body io.Reader) (*http.Request, error) {
-	url := "https://" + host + versionPrefix + path
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		return nil, err
-	}
-	switch req.Method {
-	case http.MethodGet:
-		break
-	case http.MethodDelete:
-		req.Header.Set("Accept", "application/json")
-	case http.MethodPost, http.MethodPut:
-		req.Header.Set("Accept", "application/json")
-		req.Header.Set("Content-Type", "application/json")
-	default:
-		return nil, fmt.Errorf("new request: unsupported method %s", req.Method)
-	}
-	return req, nil
-}
-
 func (c *Client) get(path string) (*http.Response, error) {
-	req, err := newRequest(http.MethodGet, c.addr, path, nil)
+	url := "https://" + c.addr + versionPrefix + path
+	req, err := NewRequest(http.MethodGet, url, c.username, c.password, nil)
 	if err != nil {
 		return nil, err
 	}
-	return c.do(req)
+	return c.Do(req)
 }
 
 func (c *Client) post(path string, body io.Reader) (*http.Response, error) {
-	req, err := newRequest(http.MethodPost, c.addr, path, body)
+	url := "https://" + c.addr + versionPrefix + path
+	req, err := NewRequest(http.MethodPost, url, c.username, c.password, body)
 	if err != nil {
 		return nil, err
 	}
-	return c.do(req)
+	return c.Do(req)
 }
 
 func (c *Client) put(path string, body io.Reader) error {
-	req, err := newRequest(http.MethodPut, c.addr, path, body)
+	url := "https://" + c.addr + versionPrefix + path
+	req, err := NewRequest(http.MethodPost, url, c.username, c.password, body)
 	if err != nil {
 		return err
 	}
-	resp, err := c.do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return err
 	}
@@ -99,11 +104,12 @@ func (c *Client) put(path string, body io.Reader) error {
 }
 
 func (c *Client) delete(path string) error {
-	req, err := newRequest(http.MethodDelete, c.addr, path, nil)
+	url := "https://" + c.addr + versionPrefix + path
+	req, err := NewRequest(http.MethodPost, url, c.username, c.password, body)
 	if err != nil {
 		return err
 	}
-	resp, err := c.do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return err
 	}
@@ -118,9 +124,4 @@ func (c *Client) delete(path string) error {
 		return fmt.Errorf("decode response: %w", err)
 	}
 	return results.Err()
-}
-
-func (c *Client) do(req *http.Request) (*http.Response, error) {
-	req.SetBasicAuth(c.username, c.password)
-	return c.Do(req)
 }

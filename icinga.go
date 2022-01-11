@@ -24,23 +24,8 @@
 package icinga
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
-)
-
-type State int
-
-const (
-	StateOK State = 0 + iota
-	StateWarning
-	StateCritical
-	StateUnknown
-)
-
-const (
-	HostUp State = 0 + iota
-	HostDown
-	HostUnknown
 )
 
 // A Client represents a client connection to the Icinga2 HTTP API.
@@ -55,25 +40,29 @@ type Client struct {
 	*http.Client
 }
 
+var ErrNotExist = errors.New("object does not exist")
+var ErrExist = errors.New("object already exists")
+var ErrNoMatch = errors.New("no object matches filter")
+
 // Dial returns a new Client connected to the Icinga2 server at addr.
 // The recommended value for client is http.DefaultClient.
 // But it may also be a modified client which, for example,
 // skips TLS certificate verification.
 func Dial(addr, username, password string, client *http.Client) (*Client, error) {
 	c := &Client{addr, username, password, client}
-	if _, err := c.Status(); err != nil {
+	if _, err := c.Permissions(); err != nil {
 		return nil, err
 	}
 	return c, nil
 }
 
-func (c *Client) Status() (*http.Response, error) {
-	resp, err := c.get("/status")
+func (c *Client) Permissions() (response, error) {
+	resp, err := c.get("")
 	if err != nil {
-		return nil, err
+		return response{}, err
 	}
-	if resp.StatusCode != http.StatusOK {
-		return resp, fmt.Errorf("status %s", resp.Status)
+	if resp.StatusCode == http.StatusOK {
+		return response{}, nil
 	}
-	return resp, nil
+	return response{}, errors.New(resp.Status)
 }

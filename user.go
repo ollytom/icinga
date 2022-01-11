@@ -1,11 +1,8 @@
 package icinga
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"net/http"
 )
 
 // User represents a User object.
@@ -21,51 +18,77 @@ var testUser = User{
 	Email: "test@example.com",
 }
 
-var ErrNoUser = errors.New("no such user")
-
 func (u User) MarshalJSON() ([]byte, error) {
-	type Alias User
+	type attrs struct {
+		Email  string   `json:"email"`
+		Groups []string `json:"groups,omitempty"`
+	}
 	return json.Marshal(&struct {
-		Attrs Alias
-	}{Attrs: (Alias)(u)})
+		Attrs attrs `json:"attrs"`
+	}{
+		Attrs: attrs{
+			Email:  u.Email,
+			Groups: u.Groups,
+		},
+	})
+}
+
+func (u User) name() string {
+	return u.Name
+}
+
+func (u User) path() string {
+	return "/objects/users/" + u.Name
+}
+
+func (u User) attrs() map[string]interface{} {
+	m := make(map[string]interface{})
+	m["groups"] = u.Groups
+	m["email"] = u.Email
+	return m
 }
 
 func (c *Client) Users() ([]User, error) {
-	_, err := c.get("/objects/users")
+	objects, err := c.allObjects("/objects/users")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get all users: %w", err)
 	}
-	return []User{testUser}, nil
+	var users []User
+	for _, o := range objects {
+		v, ok := o.(User)
+		if !ok {
+			return nil, fmt.Errorf("get all users: %T in response", v)
+		}
+		users = append(users, v)
+	}
+	return users, nil
 }
 
 func (c *Client) LookupUser(name string) (User, error) {
-	resp, err := c.get("/objects/users/" + name)
+	obj, err := c.lookupObject("/objects/users/" + name)
 	if err != nil {
-		return User{}, err
+		return User{}, fmt.Errorf("lookup %s: %w", name, err)
 	}
-	if resp.StatusCode == http.StatusNotFound {
-		return User{}, fmt.Errorf("lookup %s: %w", name, ErrNoUser)
+	v, ok := obj.(User)
+	if !ok {
+		return User{}, fmt.Errorf("lookup %s: result type %T is not user", name, v)
 	}
-	return testUser, nil
+	return v, nil
 }
 
 // CreateUser creates user.
 // An error is returned if the User already exists or on any other error.
 func (c *Client) CreateUser(user User) error {
-	buf := &bytes.Buffer{}
-	if err := json.NewEncoder(buf).Encode(user); err != nil {
-		return err
-	}
-	if err := c.put("/objects/users/"+user.Name, buf); err != nil {
-		return fmt.Errorf("create %s: %w", user.Name, err)
+	if err := c.createObject(user); err != nil {
+		return fmt.Errorf("create user %s: %w", user.Name, err)
 	}
 	return nil
 }
 
 // DeleteUser deletes the User identified by name.
-// ErrNoUser is returned if the User doesn't exist.
+// ErrNotExist is returned if the User doesn't exist.
 func (c *Client) DeleteUser(name string) error {
-	if err := c.delete("/objects/users/" + name); err != nil {
+	if err := c.deleteObject("/objects/users/" + name); err != nil {
 		return fmt.Errorf("delete user %s: %w", name, err)
 	}
 	return nil

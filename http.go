@@ -1,29 +1,13 @@
 package icinga
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
+	"net/url"
 )
 
 const versionPrefix = "/v1"
-
-type results struct {
-	Results []result
-}
-
-type result struct {
-	Attrs  map[string]interface{}
-	Code   int
-	Errors []string
-	Name   string
-	Type   string
-}
-
-var ErrNoObject = errors.New("no such object")
 
 // NewRequest returns an authenticated HTTP request with appropriate header
 // for sending to an Icinga2 server.
@@ -33,9 +17,7 @@ func NewRequest(method, url, username, password string, body io.Reader) (*http.R
 		return nil, err
 	}
 	switch req.Method {
-	case http.MethodGet:
-		break
-	case http.MethodDelete:
+	case http.MethodGet, http.MethodDelete:
 		req.Header.Set("Accept", "application/json")
 	case http.MethodPost, http.MethodPut:
 		req.Header.Set("Accept", "application/json")
@@ -47,26 +29,24 @@ func NewRequest(method, url, username, password string, body io.Reader) (*http.R
 	return req, nil
 }
 
-func (res results) Err() error {
-	if len(res.Results) == 0 {
-		return nil
-	}
-	var errs []string
-	for _, r := range res.Results {
-		if len(r.Errors) == 0 {
-			continue
-		}
-		errs = append(errs, strings.Join(r.Errors, ", "))
-	}
-	if len(errs) == 0 {
-		return nil
-	}
-	return errors.New(strings.Join(errs, ", "))
-}
-
 func (c *Client) get(path string) (*http.Response, error) {
 	url := "https://" + c.addr + versionPrefix + path
 	req, err := NewRequest(http.MethodGet, url, c.username, c.password, nil)
+	if err != nil {
+		return nil, err
+	}
+	return c.Do(req)
+}
+
+func (c *Client) getFilter(path, filter string) (*http.Response, error) {
+	u, err := url.Parse("https://" + c.addr + versionPrefix + path)
+	if err != nil {
+		return nil, err
+	}
+	v := url.Values{}
+	v.Set("filter", filter)
+	u.RawQuery = v.Encode()
+	req, err := NewRequest(http.MethodGet, u.String(), c.username, c.password, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -82,46 +62,20 @@ func (c *Client) post(path string, body io.Reader) (*http.Response, error) {
 	return c.Do(req)
 }
 
-func (c *Client) put(path string, body io.Reader) error {
+func (c *Client) put(path string, body io.Reader) (*http.Response, error) {
 	url := "https://" + c.addr + versionPrefix + path
-	req, err := NewRequest(http.MethodPost, url, c.username, c.password, body)
+	req, err := NewRequest(http.MethodPut, url, c.username, c.password, body)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	resp, err := c.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode == http.StatusOK {
-		return nil
-	}
-	defer resp.Body.Close()
-	var results results
-	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
-		return fmt.Errorf("decode response: %w", err)
-	}
-	return results.Err()
+	return c.Do(req)
 }
 
-func (c *Client) delete(path string) error {
+func (c *Client) delete(path string) (*http.Response, error) {
 	url := "https://" + c.addr + versionPrefix + path
-	req, err := NewRequest(http.MethodPost, url, c.username, c.password, body)
+	req, err := NewRequest(http.MethodDelete, url, c.username, c.password, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	resp, err := c.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode == http.StatusOK {
-		return nil
-	} else if resp.StatusCode == http.StatusNotFound {
-		return ErrNoObject
-	}
-	defer resp.Body.Close()
-	var results results
-	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
-		return fmt.Errorf("decode response: %w", err)
-	}
-	return results.Err()
+	return c.Do(req)
 }

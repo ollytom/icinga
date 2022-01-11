@@ -36,20 +36,15 @@ func (c *Client) lookupObject(objpath string) (object, error) {
 }
 
 func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
-	var resp *http.Response
-	var err error
-	if expr == "" {
-		resp, err = c.get(objpath)
-	} else {
-		resp, err = c.getFilter(objpath, expr)
-		if resp.StatusCode == http.StatusNotFound {
-			return nil, ErrNoMatch
-		}
-	}
+	resp, err := c.get(objpath, expr)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if expr != "" && resp.StatusCode == http.StatusNotFound {
+		return nil, ErrNoMatch
+		
+	}
 	iresp, err := parseResponse(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("parse response: %v", err)

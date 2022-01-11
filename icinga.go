@@ -57,7 +57,7 @@ func Dial(addr, username, password string, client *http.Client) (*Client, error)
 }
 
 func (c *Client) Permissions() (response, error) {
-	resp, err := c.get("")
+	resp, err := c.get("", "")
 	if err != nil {
 		return response{}, err
 	}

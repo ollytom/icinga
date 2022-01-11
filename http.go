@@ -29,23 +29,16 @@ func NewRequest(method, url, username, password string, body io.Reader) (*http.R
 	return req, nil
 }
 
-func (c *Client) get(path string) (*http.Response, error) {
-	url := "https://" + c.addr + versionPrefix + path
-	req, err := NewRequest(http.MethodGet, url, c.username, c.password, nil)
-	if err != nil {
-		return nil, err
-	}
-	return c.Do(req)
-}
-
-func (c *Client) getFilter(path, filter string) (*http.Response, error) {
+func (c *Client) get(path, filter string) (*http.Response, error) {
 	u, err := url.Parse("https://" + c.addr + versionPrefix + path)
 	if err != nil {
 		return nil, err
 	}
-	v := url.Values{}
-	v.Set("filter", filter)
-	u.RawQuery = v.Encode()
+	if filter != "" {
+		v := url.Values{}
+		v.Set("filter", filter)
+		u.RawQuery = v.Encode()	
+	}
 	req, err := NewRequest(http.MethodGet, u.String(), c.username, c.password, nil)
 	if err != nil {
 		return nil, err

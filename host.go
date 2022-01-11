@@ -69,36 +69,19 @@ func (h Host) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jhost)
 }
 
-// Hosts returns all Hosts in the Icinga2 configuration.
-func (c *Client) Hosts() ([]Host, error) {
-	objects, err := c.filterObjects("/objects/hosts", "")
+// Hosts returns Hosts matching the filter expression filter.
+// If no hosts match, error wraps ErrNoMatch.
+// To fetch all hosts, set filter to the empty string ("").
+func (c *Client) Hosts(filter string) ([]Host, error) {
+	objects, err := c.filterObjects("/objects/hosts", filter)
 	if err != nil {
-		return nil, fmt.Errorf("get all hosts: %w", err)
+		return nil, fmt.Errorf("get hosts filter %q: %w", filter, err)
 	}
 	var hosts []Host
 	for _, o := range objects {
 		v, ok := o.(Host)
 		if !ok {
 			return nil, fmt.Errorf("get all hosts: %T in response", v)
-		}
-		hosts = append(hosts, v)
-	}
-	return hosts, nil
-}
-
-// FilterHosts returns any matching hosts after applying the filter
-// expression expr. If no hosts match, an empty slice and an error wrapping
-// ErrNoMatch is returned.
-func (c *Client) FilterHosts(expr string) ([]Host, error) {
-	objects, err := c.filterObjects("/objects/hosts", expr)
-	if err != nil {
-		return nil, fmt.Errorf("filter hosts %q: %w", expr, err)
-	}
-	var hosts []Host
-	for _, o := range objects {
-		v, ok := o.(Host)
-		if !ok {
-			return nil, fmt.Errorf("filter hosts %q: %T in response", expr, v)
 		}
 		hosts = append(hosts, v)
 	}

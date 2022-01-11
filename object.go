@@ -16,7 +16,7 @@ type object interface {
 }
 
 func (c *Client) lookupObject(objpath string) (object, error) {
-	resp, err := c.get(objpath)
+	resp, err := c.get(objpath, "")
 	if err != nil {
 		return nil, err
 	}

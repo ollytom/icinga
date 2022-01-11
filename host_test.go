@@ -52,7 +52,7 @@ func TestFilter(t *testing.T) {
 		}
 		t.Logf("created host %s", h.Name)
 	}
-	hosts, err := client.FilterHosts("match(\"*example.org\", host.name)")
+	hosts, err := client.Hosts("match(\"*example.org\", host.name)")
 	if err != nil {
 		t.Fatal(err)
 	}

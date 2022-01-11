@@ -75,15 +75,7 @@ func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
 func (c *Client) createObject(obj object) error {
 	buf := &bytes.Buffer{}
 	switch v := obj.(type) {
-	case Host:
-		if err := json.NewEncoder(buf).Encode(v); err != nil {
-			return err
-		}
-	case Service:
-		if err := json.NewEncoder(buf).Encode(v); err != nil {
-			return err
-		}
-	case User:
+	case Host, Service, User:
 		if err := json.NewEncoder(buf).Encode(v); err != nil {
 			return err
 		}

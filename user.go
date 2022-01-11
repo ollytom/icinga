@@ -49,7 +49,7 @@ func (u User) attrs() map[string]interface{} {
 }
 
 func (c *Client) Users() ([]User, error) {
-	objects, err := c.allObjects("/objects/users")
+	objects, err := c.filterObjects("/objects/users", "")
 	if err != nil {
 		return nil, fmt.Errorf("get all users: %w", err)
 	}

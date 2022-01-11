@@ -71,7 +71,7 @@ func (h Host) MarshalJSON() ([]byte, error) {
 
 // Hosts returns all Hosts in the Icinga2 configuration.
 func (c *Client) Hosts() ([]Host, error) {
-	objects, err := c.allObjects("/objects/hosts")
+	objects, err := c.filterObjects("/objects/hosts", "")
 	if err != nil {
 		return nil, fmt.Errorf("get all hosts: %w", err)
 	}

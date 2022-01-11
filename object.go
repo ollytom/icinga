@@ -35,35 +35,24 @@ func (c *Client) lookupObject(objpath string) (object, error) {
 	return objectFromLookup(iresp)
 }
 
-func (c *Client) allObjects(objpath string) ([]object, error) {
-	resp, err := c.get(objpath)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	iresp, err := parseResponse(resp.Body)
-	if err != nil {
-		return nil, err
-	} else if iresp.Error != nil {
-		return nil, iresp.Error
-	} else if resp.StatusCode != http.StatusOK {
-		return nil, errors.New(resp.Status)
-	}
-	return iresp.Results, nil
-}
-
 func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
-	resp, err := c.getFilter(objpath, expr)
+	var resp *http.Response
+	var err error
+	if expr == "" {
+		resp, err = c.get(objpath)
+	} else {
+		resp, err = c.getFilter(objpath, expr)
+		if resp.StatusCode == http.StatusNotFound {
+			return nil, ErrNoMatch
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusNotFound {
-		return nil, ErrNoMatch
-	}
 	iresp, err := parseResponse(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse response: %v", err)
 	} else if iresp.Error != nil {
 		return nil, iresp.Error
 	} else if resp.StatusCode != http.StatusOK {

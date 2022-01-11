@@ -1,0 +1,42 @@
+{
+    "results": [
+        {
+            "attrs": {
+                "__name": "test",
+                "active": true,
+                "display_name": "test",
+                "email": "test@example.com",
+                "enable_notifications": true,
+                "groups": [],
+                "ha_mode": 0,
+                "last_notification": 0,
+                "name": "test",
+                "original_attributes": null,
+                "package": "_etc",
+                "pager": "",
+                "paused": false,
+                "period": "",
+                "source_location": {
+                    "first_column": 1,
+                    "first_line": 56,
+                    "last_column": 18,
+                    "last_line": 56,
+                    "path": "/etc/icinga2/conf.d/ye.conf"
+                },
+                "states": null,
+                "templates": [
+                    "test"
+                ],
+                "type": "User",
+                "types": null,
+                "vars": null,
+                "version": 0,
+                "zone": ""
+            },
+            "joins": {},
+            "meta": {},
+            "name": "test",
+            "type": "User"
+        }
+    ]
+}

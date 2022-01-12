@@ -2,7 +2,8 @@ package icinga provides a client to the Icinga2 HTTP API.
 
 [![godocs.io](http://godocs.io/olowe.co/icinga?status.svg)](http://godocs.io/olowe.co/icinga)
 
-Send any patches, questions or requests to the [mailing list][list] [~otl/icinga@lists.sr.ht](mailto:~otl/icinga@lists.sr.ht) 🙂
+Send patches, questions or a friendly "hello" to the mailing list: [~otl/icinga@lists.sr.ht](mailto:~otl/icinga@lists.sr.ht) 🙂
+Or, read [the archives][list].
 
 [list]: https://lists.sr.ht/~otl/icinga
 
@@ -56,13 +57,17 @@ Some code is automatically generated. Ensure it's up-to-date before starting wor
 
 	go generate
 
-Make some changes, then run the tests. No fancy test framework:
+Make some changes, then run the tests:
 
 	go test
 
-Send any questions, patches, requests to the mailing list [~otl/icinga@lists.sr.ht](mailto:~otl/icinga@lists.sr.ht)
+Please send any patches to the [mailing list](https://lists.sr.ht/~otl/icinga):
 
-### Testing
+	git send-email --to="~otl/icinga@lists.sr.ht" HEAD^
+
+Thanks!
+
+### Tests
 
 Some tests dial an instance of Icinga2 running on the loopback address
 and the standard Icinga2 port 5665 ("127.0.0.1:5665"). If this fails,

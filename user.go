@@ -37,10 +37,3 @@ func (u User) name() string {
 func (u User) path() string {
 	return "/objects/users/" + u.Name
 }
-
-func (u User) attrs() map[string]interface{} {
-	m := make(map[string]interface{})
-	m["groups"] = u.Groups
-	m["email"] = u.Email
-	return m
-}

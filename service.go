@@ -10,12 +10,6 @@ func (s Service) path() string {
 	return "/objects/services/" + s.Name
 }
 
-func (s Service) attrs() map[string]interface{} {
-	m := make(map[string]interface{})
-	m["display_name"] = s.DisplayName
-	return m
-}
-
 // Service represents a Service object.
 type Service struct {
 	Name         string `json:"__name"`

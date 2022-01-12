@@ -41,12 +41,6 @@ func (h Host) path() string {
 	return "/objects/hosts/" + h.Name
 }
 
-func (h Host) attrs() map[string]interface{} {
-	m := make(map[string]interface{})
-	m["display_name"] = h.DisplayName
-	return m
-}
-
 func (h Host) MarshalJSON() ([]byte, error) {
 	type Attrs struct {
 		Address      string `json:"address"`

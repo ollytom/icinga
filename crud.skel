@@ -1,0 +1,51 @@
+// TYPEs returns a slice of TYPE matching the filter expression filter.
+// If no hosts match, error wraps ErrNoMatch.
+// To fetch all LOWER, set filter to the empty string ("").
+func (c *Client) TYPEs(filter string) ([]TYPE, error) {
+	objects, err := c.filterObjects("/objects/PLURAL", filter)
+	if err != nil {
+		return nil, fmt.Errorf("get PLURAL filter %q: %w", filter, err)
+	}
+	var PLURAL []TYPE
+	for _, o := range objects {
+		v, ok := o.(TYPE)
+		if !ok {
+			return nil, fmt.Errorf("get PLURAL filter %q: %T in response", filter, v)
+		}
+		PLURAL = append(PLURAL, v)
+	}
+	return PLURAL, nil
+}
+
+// LookupTYPE returns the TYPE identified by name. If no TYPE is found, error
+// wraps ErrNotExist.
+func (c *Client) LookupTYPE(name string) (TYPE, error) {
+	obj, err := c.lookupObject("/objects/PLURAL/" + name)
+	if err != nil {
+		return TYPE{}, fmt.Errorf("lookup LOWER %s: %w", name, err)
+	}
+	v, ok := obj.(TYPE)
+	if !ok {
+		return TYPE{}, fmt.Errorf("lookup LOWER %s: result type %T is not TYPE", name, v)
+	}
+	return v, nil
+}
+
+// CreateTYPE creates LOWER. Some fields of LOWER must be set for successful
+// creation; see the type definition of TYPE for details.
+func (c *Client) CreateTYPE(LOWER TYPE) error {
+	if err := c.createObject(LOWER); err != nil {
+		return fmt.Errorf("create LOWER %s: %w", LOWER.Name, err)
+	}
+	return nil
+}
+
+// DeleteTYPE deletes the TYPE identified by name.
+// If no TYPE is found, error wraps ErrNotExist.
+func (c *Client) DeleteTYPE(name string) error {
+	if err := c.deleteObject("/objects/PLURAL/" + name); err != nil {
+		return fmt.Errorf("delete LOWER %s: %w", name, err)
+	}
+	return nil
+}
+

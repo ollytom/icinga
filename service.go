@@ -1,9 +1,6 @@
 package icinga
 
-import (
-	"encoding/json"
-	"fmt"
-)
+import "encoding/json"
 
 func (s Service) name() string {
 	return s.Name
@@ -62,23 +59,4 @@ func (s Service) MarshalJSON() ([]byte, error) {
 		Attrs map[string]interface{} `json:"attrs"`
 	}{Attrs: attrs}
 	return json.Marshal(jservice)
-}
-
-func (c *Client) CreateService(service Service) error {
-	if err := c.createObject(service); err != nil {
-		return fmt.Errorf("create service %s: %w", service.Name, err)
-	}
-	return nil
-}
-
-func (c *Client) LookupService(name string) (Service, error) {
-	obj, err := c.lookupObject("/objects/services/" + name)
-	if err != nil {
-		return Service{}, fmt.Errorf("lookup %s: %w", name, err)
-	}
-	v, ok := obj.(Service)
-	if !ok {
-		return Service{}, fmt.Errorf("lookup %s: result type %T is not service", name, obj)
-	}
-	return v, nil
 }

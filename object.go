@@ -1,3 +1,4 @@
+
 package icinga
 
 import (
@@ -11,9 +12,10 @@ import (
 
 type object interface {
 	name() string
-	attrs() map[string]interface{}
 	path() string
 }
+
+//go:generate ./crud.sh -o crud.go
 
 func (c *Client) lookupObject(objpath string) (object, error) {
 	resp, err := c.get(objpath, "")

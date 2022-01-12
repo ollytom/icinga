@@ -1,4 +1,3 @@
-
 package icinga
 
 import (
@@ -45,7 +44,7 @@ func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
 	defer resp.Body.Close()
 	if expr != "" && resp.StatusCode == http.StatusNotFound {
 		return nil, ErrNoMatch
-		
+
 	}
 	iresp, err := parseResponse(resp.Body)
 	if err != nil {

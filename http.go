@@ -37,7 +37,7 @@ func (c *Client) get(path, filter string) (*http.Response, error) {
 	if filter != "" {
 		v := url.Values{}
 		v.Set("filter", filter)
-		u.RawQuery = v.Encode()	
+		u.RawQuery = v.Encode()
 	}
 	req, err := NewRequest(http.MethodGet, u.String(), c.username, c.password, nil)
 	if err != nil {

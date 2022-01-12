@@ -1,5 +1,5 @@
 // TYPEs returns a slice of TYPE matching the filter expression filter.
-// If no hosts match, error wraps ErrNoMatch.
+// If no PLURAL match, error wraps ErrNoMatch.
 // To fetch all LOWER, set filter to the empty string ("").
 func (c *Client) TYPEs(filter string) ([]TYPE, error) {
 	objects, err := c.filterObjects("/objects/PLURAL", filter)

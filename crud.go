@@ -56,7 +56,7 @@ func (c *Client) DeleteHost(name string) error {
 }
 
 // Services returns a slice of Service matching the filter expression filter.
-// If no hosts match, error wraps ErrNoMatch.
+// If no services match, error wraps ErrNoMatch.
 // To fetch all service, set filter to the empty string ("").
 func (c *Client) Services(filter string) ([]Service, error) {
 	objects, err := c.filterObjects("/objects/services", filter)
@@ -107,7 +107,7 @@ func (c *Client) DeleteService(name string) error {
 }
 
 // Users returns a slice of User matching the filter expression filter.
-// If no hosts match, error wraps ErrNoMatch.
+// If no users match, error wraps ErrNoMatch.
 // To fetch all user, set filter to the empty string ("").
 func (c *Client) Users(filter string) ([]User, error) {
 	objects, err := c.filterObjects("/objects/users", filter)
@@ -156,4 +156,3 @@ func (c *Client) DeleteUser(name string) error {
 	}
 	return nil
 }
-

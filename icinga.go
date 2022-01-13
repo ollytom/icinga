@@ -7,8 +7,34 @@
 //	if err != nil {
 //		// handle error
 //	}
-//	host, err := client.LookupHost("myserver.example.com")
+//
+// Icinga2 servers in the wild often serve self-signed certificates which fail
+// verification by Go's tls client. To ignore the errors, Dial the server with a
+// modified http.Client:
+//
+//	t := http.DefaultTransport.(*http.Transport)
+//	t.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+//	c := http.DefaultClient
+//	c.Transport = t
+//	client, err := icinga.Dial(addr, user, pass, c)
 //	if err != nil {
+//		// handle error
+//	}
+//
+// Methods on Client provide API actions like looking up users and creating
+// hosts:
+//
+//	user, err := client.LookupUser("oliver")
+//	if err != nil {
+//		// handle error
+//	}
+//	host := Host{
+//		Name: "myserver.example.com",
+//		CheckCommand: "hostalive"
+//		Address: "192.0.2.1"
+//		Address6: "2001:db8::1"
+//	}
+//	if err := client.CreateHost(host); err != nil {
 //		// handle error
 //	}
 //
@@ -30,7 +56,7 @@ import (
 
 // A Client represents a client connection to the Icinga2 HTTP API.
 // It should be created using Dial.
-// Since Client wraps http.Client, standard methods such as Get and
+// Since Client wraps http.Client, exported methods such as Get and
 // PostForm can be used to implement any functionality not provided by
 // methods of Client.
 type Client struct {

@@ -5,49 +5,9 @@ package icinga provides a client to the Icinga2 HTTP API.
 Send patches, questions or a friendly "hello" to the mailing list: [~otl/icinga@lists.sr.ht](mailto:~otl/icinga@lists.sr.ht) 🙂
 Or, read [the archives][list].
 
-[list]: https://lists.sr.ht/~otl/icinga
-
 ## Quick Start
 
-A Client manages interaction with an Icinga2 server.
-It is created using Dial. Provide the address, in `host:port` form, API username and password, and a `http.Client`:
-
-	client, err := icinga.Dial("icinga.example.com:5665", "icinga", "secret", http.DefaultClient)
-	if err != nil {
-		// handle error
-	}
-
-Icinga2 servers in the wild often serve self-signed certificates which
-fail verification by Go's tls client. To ignore the errors, Dial the server
-with a modified `http.Client`:
-
-	t := http.DefaultTransport.(*http.Transport)
-	t.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	c := http.DefaultClient
-	c.Transport = t
-	client, err := icinga.Dial(addr, user, pass, c)
-	if err != nil {
-		// handle error
-	}
-
-Methods on `Client` provide API actions like looking up users and creating hosts:
-
-	user, err := client.LookupUser("oliver")
-	if err != nil {
-		// handle error
-	}
-	host := Host{
-		Name: "myserver.example.com",
-		CheckCommand: "hostalive"
-		Address: "192.0.2.1"
-		Address6: "2001:db8::1"
-	}
-	if err := client.CreateHost(host); err != nil {
-		// handle error
-	}
-
-Not all functionality of the Icinga2 API is implemented.
-For more detail, see the [godocs][godocs].
+See the [package overview godoc][godocs] for getting started examples.
 
 [godocs]: https://godocs.io/olowe.co/icinga
 
@@ -65,7 +25,10 @@ Please send any patches to the [mailing list](https://lists.sr.ht/~otl/icinga):
 
 	git send-email --to="~otl/icinga@lists.sr.ht" HEAD^
 
-Thanks!
+For those unfamiliar with this workflow, see [git-send-email.io][sendemail].
+
+[list]: https://lists.sr.ht/~otl/icinga
+[sendemail]: https://git-send-email.io
 
 ### Tests
 

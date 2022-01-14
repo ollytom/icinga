@@ -52,7 +52,7 @@ func TestUserRoundTrip(t *testing.T) {
 	tp.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	c := http.DefaultClient
 	c.Transport = tp
-	client, err := Dial("127.0.0.1:5665", "root", "8eec5ede1673b757", c)
+	client, err := Dial("127.0.0.1:5665", "root", "icinga", c)
 	if err != nil {
 		t.Skipf("no local test icinga? got: %v", err)
 	}

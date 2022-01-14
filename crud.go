@@ -156,3 +156,55 @@ func (c *Client) DeleteUser(name string) error {
 	}
 	return nil
 }
+
+// HostGroups returns a slice of HostGroup matching the filter expression filter.
+// If no hostgroups match, error wraps ErrNoMatch.
+// To fetch all hostgroup, set filter to the empty string ("").
+func (c *Client) HostGroups(filter string) ([]HostGroup, error) {
+	objects, err := c.filterObjects("/objects/hostgroups", filter)
+	if err != nil {
+		return nil, fmt.Errorf("get hostgroups filter %q: %w", filter, err)
+	}
+	var hostgroups []HostGroup
+	for _, o := range objects {
+		v, ok := o.(HostGroup)
+		if !ok {
+			return nil, fmt.Errorf("get hostgroups filter %q: %T in response", filter, v)
+		}
+		hostgroups = append(hostgroups, v)
+	}
+	return hostgroups, nil
+}
+
+// LookupHostGroup returns the HostGroup identified by name. If no HostGroup is found, error
+// wraps ErrNotExist.
+func (c *Client) LookupHostGroup(name string) (HostGroup, error) {
+	obj, err := c.lookupObject("/objects/hostgroups/" + name)
+	if err != nil {
+		return HostGroup{}, fmt.Errorf("lookup hostgroup %s: %w", name, err)
+	}
+	v, ok := obj.(HostGroup)
+	if !ok {
+		return HostGroup{}, fmt.Errorf("lookup hostgroup %s: result type %T is not HostGroup", name, v)
+	}
+	return v, nil
+}
+
+// CreateHostGroup creates hostgroup. Some fields of hostgroup must be set for successful
+// creation; see the type definition of HostGroup for details.
+func (c *Client) CreateHostGroup(hostgroup HostGroup) error {
+	if err := c.createObject(hostgroup); err != nil {
+		return fmt.Errorf("create hostgroup %s: %w", hostgroup.Name, err)
+	}
+	return nil
+}
+
+// DeleteHostGroup deletes the HostGroup identified by name.
+// If no HostGroup is found, error wraps ErrNotExist.
+func (c *Client) DeleteHostGroup(name string) error {
+	if err := c.deleteObject("/objects/hostgroups/" + name); err != nil {
+		return fmt.Errorf("delete hostgroup %s: %w", name, err)
+	}
+	return nil
+}
+

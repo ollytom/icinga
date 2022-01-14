@@ -71,6 +71,12 @@ func parseResponse(r io.Reader) (*response, error) {
 				return nil, err
 			}
 			resp.Results = append(resp.Results, u)
+		case "HostGroup":
+			var h HostGroup
+			if err := json.Unmarshal(r.Attrs, &h); err != nil {
+				return nil, err
+			}
+			resp.Results = append(resp.Results, h)
 		default:
 			return nil, fmt.Errorf("unsupported unmarshal of type %s", r.Type)
 		}

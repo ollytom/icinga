@@ -1,6 +1,6 @@
 #!/bin/sh
 
-types="Host Service User"
+types="Host Service User HostGroup"
 
 args=`getopt o: $*`
 if test $? -ne 0

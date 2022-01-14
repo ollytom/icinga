@@ -2,7 +2,8 @@ package icinga
 
 import "encoding/json"
 
-// Host represents a Host object.
+// Host represents a Host object. To create a Host, the Name and CheckCommand
+// fields must be set.
 type Host struct {
 	Name         string    `json:"name"`
 	Address      string    `json:"address"`
@@ -11,6 +12,11 @@ type Host struct {
 	State        HostState `json:"state"`
 	CheckCommand string    `json:"check_command"`
 	DisplayName  string    `json:"display_name"`
+}
+
+type HostGroup struct {
+	Name string `json:"name"`
+	DisplayName string `json:"display_name"`
 }
 
 type HostState int
@@ -41,6 +47,14 @@ func (h Host) path() string {
 	return "/objects/hosts/" + h.Name
 }
 
+func (hg HostGroup) name() string {
+	return hg.Name
+}
+
+func (hg HostGroup) path() string {
+	return "/objects/hostgroups/" + hg.Name
+}
+
 func (h Host) MarshalJSON() ([]byte, error) {
 	type Attrs struct {
 		Address      string `json:"address"`
@@ -58,4 +72,18 @@ func (h Host) MarshalJSON() ([]byte, error) {
 		},
 	}
 	return json.Marshal(jhost)
+}
+
+func (hg HostGroup) MarshalJSON() ([]byte, error) {
+	type attrs struct {
+		DisplayName  string `json:"display_name"`
+	}
+	type group struct {
+		Attrs attrs `json:"attrs"`
+	}
+	return json.Marshal(&group{
+		Attrs: attrs{
+			DisplayName: hg.DisplayName,
+		},
+	})
 }

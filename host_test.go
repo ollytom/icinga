@@ -35,14 +35,28 @@ func TestFilter(t *testing.T) {
 	tp.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	c := http.DefaultClient
 	c.Transport = tp
-	client, err := Dial("127.0.0.1:5665", "root", "8eec5ede1673b757", c)
+	client, err := Dial("127.0.0.1:5665", "root", "icinga", c)
 	if err != nil {
 		t.Skipf("no local test icinga? got: %v", err)
 	}
 
+	hostgroup := HostGroup{Name: "examples", DisplayName: "Test Group"}
+	if err := client.CreateHostGroup(hostgroup); err != nil {
+		t.Error(err)
+	}
+	hostgroup, err = client.LookupHostGroup(hostgroup.Name)
+	if err != nil {
+		t.Error(err)
+	}
+	defer client.DeleteHostGroup(hostgroup.Name)
+
 	var want, got []string
 	for i := 0; i < 5; i++ {
-		h := Host{Name: randomHostname(), CheckCommand: "hostalive"}
+		h := Host{
+			Name: randomHostname(),
+			CheckCommand: "hostalive", 
+			Groups: []string{hostgroup.Name},
+		}
 		want = append(want, h.Name)
 		if err := client.CreateHost(h); err != nil {
 			if !errors.Is(err, ErrExist) {
@@ -52,6 +66,13 @@ func TestFilter(t *testing.T) {
 		}
 		t.Logf("created host %s", h.Name)
 	}
+	defer func() {
+		for _, name := range want {
+			if err := client.DeleteHost(name); err != nil {
+				t.Log(err)
+			}
+		}
+	}()			
 	hosts, err := client.Hosts("match(\"*example.org\", host.name)")
 	if err != nil {
 		t.Fatal(err)

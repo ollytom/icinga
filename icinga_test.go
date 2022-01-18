@@ -1,10 +1,15 @@
-package icinga
+package icinga_test
 
 import (
+	"crypto/tls"
 	"errors"
 	"math/rand"
+	"net/http"
+	"reflect"
 	"sort"
 	"testing"
+
+	"olowe.co/icinga"
 )
 
 func randomHostname() string {
@@ -14,6 +19,14 @@ func randomHostname() string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b) + ".example.org"
+}
+
+func newTestClient() (*icinga.Client, error) {
+	tp := http.DefaultTransport.(*http.Transport)
+	tp.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	c := http.DefaultClient
+	c.Transport = tp
+	return icinga.Dial("127.0.0.1:5665", "root", "icinga", c)
 }
 
 func compareStringSlice(a, b []string) bool {
@@ -34,7 +47,7 @@ func TestFilter(t *testing.T) {
 		t.Skipf("no local test icinga? got: %v", err)
 	}
 
-	hostgroup := HostGroup{Name: "examples", DisplayName: "Test Group"}
+	hostgroup := icinga.HostGroup{Name: "examples", DisplayName: "Test Group"}
 	if err := client.CreateHostGroup(hostgroup); err != nil {
 		t.Error(err)
 	}
@@ -46,14 +59,14 @@ func TestFilter(t *testing.T) {
 
 	var want, got []string
 	for i := 0; i < 5; i++ {
-		h := Host{
+		h := icinga.Host{
 			Name:         randomHostname(),
 			CheckCommand: "hostalive",
 			Groups:       []string{hostgroup.Name},
 		}
 		want = append(want, h.Name)
 		if err := client.CreateHost(h); err != nil {
-			if !errors.Is(err, ErrExist) {
+			if !errors.Is(err, icinga.ErrExist) {
 				t.Error(err)
 			}
 			continue
@@ -80,4 +93,44 @@ func TestFilter(t *testing.T) {
 		t.Fail()
 	}
 	t.Logf("want %+v got %+v", want, got)
+}
+
+func TestUserRoundTrip(t *testing.T) {
+	client, err := newTestClient()
+	if err != nil {
+		t.Skipf("no local test icinga? got: %v", err)
+	}
+	want := icinga.User{Name: "olly", Email: "olly@example.com", Groups: []string{}}
+	if err := client.CreateUser(want); err != nil && !errors.Is(err, icinga.ErrExist) {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := client.DeleteUser(want.Name); err != nil {
+			t.Error(err)
+		}
+	}()
+	got, err := client.LookupUser(want.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("want %+v, got %+v", want, got)
+	}
+}
+
+func TestChecker(t *testing.T) {
+	client, err := newTestClient()
+	if err != nil {
+		t.Skipf("no local test icinga? got: %v", err)
+	}
+
+	s := icinga.Service{Name: "9p.io!http"}
+	if err := s.Check(client); err != nil {
+		t.Fatal(err)
+	}
+	s, err = client.LookupService("9p.io!http")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%+v\n", s)
 }

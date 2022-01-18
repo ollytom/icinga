@@ -27,7 +27,6 @@ do
 	esac
 done
 
-
 if test -n "$file"
 then
 	echo "$head" > "$file"
@@ -39,8 +38,8 @@ for t in $types
 do
 	if test -n "$file"
 	then
-		awk -v "type=$t" -f crud.awk crud.skel >> "$file"
+		awk -v "type=$t" -f crud.awk crud.skel | gofmt >> "$file"
 	else
-		awk -v "type=$t" -f crud.awk crud.skel
+		awk -v "type=$t" -f crud.awk crud.skel | gofmt
 	fi
 done

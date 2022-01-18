@@ -56,6 +56,12 @@ Source code for the basic lookup, create and delete operations of some
 Icinga2 object types, such as Host and Service, are generated
 automatically.
 
+To generate the code, ensure the following tools are available:
+
+* POSIX shell (/bin/sh)
+* awk
+* gofmt
+
 The shell script crud.sh writes Go source code by reading a template
 file and doing some text substitution. It loops through object types,
 piping the template file crud.skel into the awk script crud.awk for

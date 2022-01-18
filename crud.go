@@ -55,7 +55,6 @@ func (c *Client) DeleteHost(name string, cascade bool) error {
 	}
 	return nil
 }
-
 // Services returns a slice of Service matching the filter expression filter.
 // If no services match, error wraps ErrNoMatch.
 // To fetch all service, set filter to the empty string ("").
@@ -107,7 +106,6 @@ func (c *Client) DeleteService(name string, cascade bool) error {
 	}
 	return nil
 }
-
 // Users returns a slice of User matching the filter expression filter.
 // If no users match, error wraps ErrNoMatch.
 // To fetch all user, set filter to the empty string ("").
@@ -159,7 +157,6 @@ func (c *Client) DeleteUser(name string, cascade bool) error {
 	}
 	return nil
 }
-
 // HostGroups returns a slice of HostGroup matching the filter expression filter.
 // If no hostgroups match, error wraps ErrNoMatch.
 // To fetch all hostgroup, set filter to the empty string ("").

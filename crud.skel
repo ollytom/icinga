@@ -44,7 +44,7 @@ func (c *Client) CreateTYPE(LOWER TYPE) error {
 // depending on the TYPE are also deleted. If no TYPE is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteTYPE(name string, cascade bool) error {
-	if err := c.deleteObject("/objects/PLURAL/" + name, cascade); err != nil {
+	if err := c.deleteObject("/objects/PLURAL/"+name, cascade); err != nil {
 		return fmt.Errorf("delete LOWER %s: %w", name, err)
 	}
 	return nil

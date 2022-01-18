@@ -57,22 +57,17 @@ func (hg HostGroup) path() string {
 }
 
 func (h Host) MarshalJSON() ([]byte, error) {
-	type Attrs struct {
-		Address      string `json:"address"`
-		CheckCommand string `json:"check_command"`
-		DisplayName  string `json:"display_name"`
+	attrs := make(map[string]interface{})
+	attrs["address"] = h.Address
+	attrs["address6"] = h.Address6
+	if len(h.Groups) > 0 {
+		attrs["groups"] = h.Groups
 	}
-	type host struct {
-		Attrs Attrs `json:"attrs"`
-	}
-	jhost := &host{
-		Attrs: Attrs{
-			Address:      h.Address,
-			CheckCommand: h.CheckCommand,
-			DisplayName:  h.DisplayName,
-		},
-	}
-	return json.Marshal(jhost)
+	attrs["check_command"] = h.CheckCommand
+	attrs["display_name"] = h.DisplayName
+	m := make(map[string]interface{})
+	m["attrs"] = attrs
+	return json.Marshal(m)
 }
 
 func (hg HostGroup) MarshalJSON() ([]byte, error) {

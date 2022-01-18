@@ -10,10 +10,11 @@ import (
 
 type apiResponse struct {
 	Results []struct {
-		Name   string
-		Type   string
-		Errors []string
-		Attrs  json.RawMessage
+		Name        string
+		Type        string
+		Errors      []string
+		Permissions []string
+		Attrs       json.RawMessage
 	}
 	Status string
 }

@@ -76,19 +76,28 @@ var ErrNoMatch = errors.New("no object matches filter")
 // skips TLS certificate verification.
 func Dial(addr, username, password string, client *http.Client) (*Client, error) {
 	c := &Client{addr, username, password, client}
-	if _, err := c.Permissions(); err != nil {
+	if _, err := Permissions(c); err != nil {
 		return nil, err
 	}
 	return c, nil
 }
 
-func (c *Client) Permissions() (response, error) {
+// Permissions returns the permissions granted to the Client.
+func Permissions(c *Client) ([]string, error) {
 	resp, err := c.get("", "")
 	if err != nil {
-		return response{}, err
+		return nil, err
 	}
-	if resp.StatusCode == http.StatusOK {
-		return response{}, nil
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status)
 	}
-	return response{}, errors.New(resp.Status)
+	defer resp.Body.Close()
+	apiresp, err := parseAPIResponse(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	for i := range apiresp.Results {
+		return apiresp.Results[i].Permissions, nil
+	}
+	return nil, errors.New("no permissions")
 }

@@ -21,6 +21,27 @@ func randomHostname() string {
 	return string(b) + ".example.org"
 }
 
+func createTestHosts(c *icinga.Client) ([]icinga.Host, error) {
+	hostgroup := icinga.HostGroup{Name: "test", DisplayName: "Test Group"}
+	if err := c.CreateHostGroup(hostgroup); err != nil && !errors.Is(err, icinga.ErrExist) {
+		return nil, err
+	}
+
+	var hosts []icinga.Host
+	for i := 0; i < 5; i++ {
+		h := icinga.Host{
+			Name:         randomHostname(),
+			CheckCommand: "random",
+			Groups:       []string{hostgroup.Name},
+		}
+		hosts = append(hosts, h)
+		if err := c.CreateHost(h); err != nil && !errors.Is(err, icinga.ErrExist) {
+			return nil, err
+		}
+	}
+	return hosts, nil
+}
+
 func newTestClient() (*icinga.Client, error) {
 	tp := http.DefaultTransport.(*http.Transport)
 	tp.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
@@ -47,40 +68,22 @@ func TestFilter(t *testing.T) {
 		t.Skipf("no local test icinga? got: %v", err)
 	}
 
-	hostgroup := icinga.HostGroup{Name: "examples", DisplayName: "Test Group"}
-	if err := client.CreateHostGroup(hostgroup); err != nil {
-		t.Error(err)
-	}
-	hostgroup, err = client.LookupHostGroup(hostgroup.Name)
-	if err != nil {
-		t.Error(err)
-	}
-	defer client.DeleteHostGroup(hostgroup.Name, false)
-
 	var want, got []string
-	for i := 0; i < 5; i++ {
-		h := icinga.Host{
-			Name:         randomHostname(),
-			CheckCommand: "hostalive",
-			Groups:       []string{hostgroup.Name},
-		}
+	hosts, err := createTestHosts(client)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, h := range hosts {
 		want = append(want, h.Name)
-		if err := client.CreateHost(h); err != nil {
-			if !errors.Is(err, icinga.ErrExist) {
-				t.Error(err)
-			}
-			continue
-		}
-		t.Logf("created host %s", h.Name)
 	}
 	defer func() {
-		for _, name := range want {
-			if err := client.DeleteHost(name, false); err != nil {
+		for _, h := range hosts {
+			if err := client.DeleteHost(h.Name, false); err != nil {
 				t.Log(err)
 			}
 		}
 	}()
-	hosts, err := client.Hosts("match(\"*example.org\", host.name)")
+	hosts, err = client.Hosts("match(\"*example.org\", host.name)")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -133,6 +136,31 @@ func TestChecker(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("%+v\n", s)
+}
+
+func TestCheckHostGroup(t *testing.T) {
+	client, err := newTestClient()
+	if err != nil {
+		t.Skipf("no local test icinga? got: %v", err)
+	}
+	hosts, err := createTestHosts(client)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		for _, h := range hosts {
+			if err := client.DeleteHost(h.Name, true); err != nil {
+				t.Error(err)
+			}
+		}
+	}()
+	hostgroup, err := client.LookupHostGroup("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := hostgroup.Check(client); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestCreateService(t *testing.T) {

@@ -40,6 +40,12 @@ func (h Host) Check(c *Client) error {
 	return c.check(h)
 }
 
+// Check reschedules the checks for all hosts in the HostGroup hg via the
+// provided Client.
+func (hg HostGroup) Check(c *Client) error {
+	return c.check(hg)
+}
+
 func splitServiceName(name string) []string {
 	return strings.SplitN(name, "!", 2)
 }
@@ -62,6 +68,9 @@ func (c *Client) check(ch checker) error {
 		host := a[0]
 		service := a[1]
 		filter.Expr = fmt.Sprintf("host.name == %q && service.name == %q", host, service)
+	case HostGroup:
+		filter.Type = "Host"
+		filter.Expr = fmt.Sprintf("%q in host.groups", v.Name)
 	default:
 		return fmt.Errorf("cannot check %T", v)
 	}
@@ -74,12 +83,18 @@ func (c *Client) check(ch checker) error {
 	if err != nil {
 		return fmt.Errorf("check %s: %w", ch.name(), err)
 	}
-	switch resp.StatusCode {
-	case http.StatusOK:
+	if resp.StatusCode == http.StatusOK {
 		return nil
-	case http.StatusNotFound:
+	} else if resp.StatusCode == http.StatusNotFound {
 		return fmt.Errorf("check %s: %w", ch.name(), ErrNotExist)
-	default:
-		return fmt.Errorf("check %s: %s", ch.name(), resp.Status)
 	}
+	defer resp.Body.Close()
+	iresp, err := parseResponse(resp.Body)
+	if err != nil {
+		return fmt.Errorf("check %s: parse response: %v", ch.name(), err)
+	}
+	if iresp.Error != nil {
+		return fmt.Errorf("check %s: %v", ch.name(), iresp.Error)
+	}
+	return fmt.Errorf("check %s: %s", ch.name(), resp.Status)
 }

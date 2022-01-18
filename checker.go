@@ -30,10 +30,12 @@ func (st StateType) String() string {
 	return "unsupported state type"
 }
 
+// Check reschedules the check for s via the provided Client.
 func (s Service) Check(c *Client) error {
 	return c.check(s)
 }
 
+// Check reschedules the check for h via the provided Client.
 func (h Host) Check(c *Client) error {
 	return c.check(h)
 }

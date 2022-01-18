@@ -10,6 +10,7 @@ type Host struct {
 	Address6     string    `json:"address6"`
 	Groups       []string  `json:"groups"`
 	State        HostState `json:"state"`
+	StateType    StateType `json:"state_type"`
 	CheckCommand string    `json:"check_command"`
 	DisplayName  string    `json:"display_name"`
 }

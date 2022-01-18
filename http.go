@@ -64,9 +64,17 @@ func (c *Client) put(path string, body io.Reader) (*http.Response, error) {
 	return c.Do(req)
 }
 
-func (c *Client) delete(path string) (*http.Response, error) {
-	url := "https://" + c.addr + versionPrefix + path
-	req, err := NewRequest(http.MethodDelete, url, c.username, c.password, nil)
+func (c *Client) delete(path string, cascade bool) (*http.Response, error) {
+	u, err := url.Parse("https://" + c.addr + versionPrefix + path)
+	if err != nil {
+		return nil, err
+	}
+	if cascade {
+		v := url.Values{}
+		v.Set("cascade", "1")
+		u.RawQuery = v.Encode()
+	}
+	req, err := NewRequest(http.MethodDelete, u.String(), c.username, c.password, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -85,8 +85,8 @@ func (c *Client) createObject(obj object) error {
 	return iresp.Error
 }
 
-func (c *Client) deleteObject(objpath string) error {
-	resp, err := c.delete(objpath)
+func (c *Client) deleteObject(objpath string, cascade bool) error {
+	resp, err := c.delete(objpath, cascade)
 	if err != nil {
 		return err
 	}

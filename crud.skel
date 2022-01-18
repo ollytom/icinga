@@ -40,12 +40,12 @@ func (c *Client) CreateTYPE(LOWER TYPE) error {
 	return nil
 }
 
-// DeleteTYPE deletes the TYPE identified by name.
-// If no TYPE is found, error wraps ErrNotExist.
-func (c *Client) DeleteTYPE(name string) error {
-	if err := c.deleteObject("/objects/PLURAL/" + name); err != nil {
+// DeleteTYPE deletes the TYPE identified by name. If cascade is true, objects
+// depending on the TYPE are also deleted. If no TYPE is found, error wraps
+// ErrNotExist.
+func (c *Client) DeleteTYPE(name string, cascade bool) error {
+	if err := c.deleteObject("/objects/PLURAL/" + name, cascade); err != nil {
 		return fmt.Errorf("delete LOWER %s: %w", name, err)
 	}
 	return nil
 }
-

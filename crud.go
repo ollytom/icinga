@@ -46,10 +46,11 @@ func (c *Client) CreateHost(host Host) error {
 	return nil
 }
 
-// DeleteHost deletes the Host identified by name.
-// If no Host is found, error wraps ErrNotExist.
-func (c *Client) DeleteHost(name string) error {
-	if err := c.deleteObject("/objects/hosts/" + name); err != nil {
+// DeleteHost deletes the Host identified by name. If cascade is true, objects
+// depending on the Host are also deleted. If no Host is found, error wraps
+// ErrNotExist.
+func (c *Client) DeleteHost(name string, cascade bool) error {
+	if err := c.deleteObject("/objects/hosts/"+name, cascade); err != nil {
 		return fmt.Errorf("delete host %s: %w", name, err)
 	}
 	return nil
@@ -97,10 +98,11 @@ func (c *Client) CreateService(service Service) error {
 	return nil
 }
 
-// DeleteService deletes the Service identified by name.
-// If no Service is found, error wraps ErrNotExist.
-func (c *Client) DeleteService(name string) error {
-	if err := c.deleteObject("/objects/services/" + name); err != nil {
+// DeleteService deletes the Service identified by name. If cascade is true, objects
+// depending on the Service are also deleted. If no Service is found, error wraps
+// ErrNotExist.
+func (c *Client) DeleteService(name string, cascade bool) error {
+	if err := c.deleteObject("/objects/services/"+name, cascade); err != nil {
 		return fmt.Errorf("delete service %s: %w", name, err)
 	}
 	return nil
@@ -148,10 +150,11 @@ func (c *Client) CreateUser(user User) error {
 	return nil
 }
 
-// DeleteUser deletes the User identified by name.
-// If no User is found, error wraps ErrNotExist.
-func (c *Client) DeleteUser(name string) error {
-	if err := c.deleteObject("/objects/users/" + name); err != nil {
+// DeleteUser deletes the User identified by name. If cascade is true, objects
+// depending on the User are also deleted. If no User is found, error wraps
+// ErrNotExist.
+func (c *Client) DeleteUser(name string, cascade bool) error {
+	if err := c.deleteObject("/objects/users/"+name, cascade); err != nil {
 		return fmt.Errorf("delete user %s: %w", name, err)
 	}
 	return nil
@@ -199,10 +202,11 @@ func (c *Client) CreateHostGroup(hostgroup HostGroup) error {
 	return nil
 }
 
-// DeleteHostGroup deletes the HostGroup identified by name.
-// If no HostGroup is found, error wraps ErrNotExist.
-func (c *Client) DeleteHostGroup(name string) error {
-	if err := c.deleteObject("/objects/hostgroups/" + name); err != nil {
+// DeleteHostGroup deletes the HostGroup identified by name. If cascade is true, objects
+// depending on the HostGroup are also deleted. If no HostGroup is found, error wraps
+// ErrNotExist.
+func (c *Client) DeleteHostGroup(name string, cascade bool) error {
+	if err := c.deleteObject("/objects/hostgroups/"+name, cascade); err != nil {
 		return fmt.Errorf("delete hostgroup %s: %w", name, err)
 	}
 	return nil

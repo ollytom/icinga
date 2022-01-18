@@ -55,7 +55,7 @@ func TestFilter(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	defer client.DeleteHostGroup(hostgroup.Name)
+	defer client.DeleteHostGroup(hostgroup.Name, false)
 
 	var want, got []string
 	for i := 0; i < 5; i++ {
@@ -75,7 +75,7 @@ func TestFilter(t *testing.T) {
 	}
 	defer func() {
 		for _, name := range want {
-			if err := client.DeleteHost(name); err != nil {
+			if err := client.DeleteHost(name, false); err != nil {
 				t.Log(err)
 			}
 		}
@@ -105,7 +105,7 @@ func TestUserRoundTrip(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer func() {
-		if err := client.DeleteUser(want.Name); err != nil {
+		if err := client.DeleteUser(want.Name, false); err != nil {
 			t.Error(err)
 		}
 	}()
@@ -133,4 +133,30 @@ func TestChecker(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("%+v\n", s)
+}
+
+func TestCreateService(t *testing.T) {
+	client, err := newTestClient()
+	if err != nil {
+		t.Skipf("no local test icinga? got: %v", err)
+	}
+
+	h := icinga.Host{
+		Name:         "example.com",
+		Address:      "example.com",
+		CheckCommand: "dummy",
+		DisplayName:  "RFC 2606 example host",
+	}
+	if err := client.CreateHost(h); err != nil {
+		t.Error(err)
+	}
+	defer client.DeleteHost(h.Name, true)
+	s := icinga.Service{
+		Name:         h.Name + "!http",
+		CheckCommand: "http",
+		DisplayName:  "RFC 2606 example website",
+	}
+	if err := client.CreateService(s); err != nil {
+		t.Error(err)
+	}
 }

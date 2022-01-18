@@ -10,6 +10,14 @@ import (
 	"testing"
 )
 
+func newTestClient() (*Client, error) {
+	tp := http.DefaultTransport.(*http.Transport)
+	tp.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	c := http.DefaultClient
+	c.Transport = tp
+	return Dial("127.0.0.1:5665", "root", "icinga", c)
+}
+
 func TestUser(t *testing.T) {
 	want := User{Name: "test", Email: "test@example.com", Groups: []string{}}
 	f, err := os.Open("testdata/users.json")
@@ -48,15 +56,10 @@ func TestUserMarshal(t *testing.T) {
 }
 
 func TestUserRoundTrip(t *testing.T) {
-	tp := http.DefaultTransport.(*http.Transport)
-	tp.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	c := http.DefaultClient
-	c.Transport = tp
-	client, err := Dial("127.0.0.1:5665", "root", "icinga", c)
+	client, err := newTestClient()
 	if err != nil {
 		t.Skipf("no local test icinga? got: %v", err)
 	}
-
 	want := User{Name: "olly", Email: "olly@example.com", Groups: []string{}}
 	if err := client.CreateUser(want); err != nil && !errors.Is(err, ErrExist) {
 		t.Fatal(err)

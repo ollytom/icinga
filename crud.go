@@ -207,4 +207,3 @@ func (c *Client) DeleteHostGroup(name string) error {
 	}
 	return nil
 }
-

@@ -1,10 +1,8 @@
 package icinga
 
 import (
-	"crypto/tls"
 	"errors"
 	"math/rand"
-	"net/http"
 	"sort"
 	"testing"
 )
@@ -31,11 +29,7 @@ func compareStringSlice(a, b []string) bool {
 }
 
 func TestFilter(t *testing.T) {
-	tp := http.DefaultTransport.(*http.Transport)
-	tp.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	c := http.DefaultClient
-	c.Transport = tp
-	client, err := Dial("127.0.0.1:5665", "root", "icinga", c)
+	client, err := newTestClient()
 	if err != nil {
 		t.Skipf("no local test icinga? got: %v", err)
 	}
@@ -53,9 +47,9 @@ func TestFilter(t *testing.T) {
 	var want, got []string
 	for i := 0; i < 5; i++ {
 		h := Host{
-			Name: randomHostname(),
-			CheckCommand: "hostalive", 
-			Groups: []string{hostgroup.Name},
+			Name:         randomHostname(),
+			CheckCommand: "hostalive",
+			Groups:       []string{hostgroup.Name},
 		}
 		want = append(want, h.Name)
 		if err := client.CreateHost(h); err != nil {
@@ -72,7 +66,7 @@ func TestFilter(t *testing.T) {
 				t.Log(err)
 			}
 		}
-	}()			
+	}()
 	hosts, err := client.Hosts("match(\"*example.org\", host.name)")
 	if err != nil {
 		t.Fatal(err)

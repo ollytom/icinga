@@ -15,7 +15,7 @@ type Host struct {
 }
 
 type HostGroup struct {
-	Name string `json:"name"`
+	Name        string `json:"name"`
 	DisplayName string `json:"display_name"`
 }
 
@@ -76,7 +76,7 @@ func (h Host) MarshalJSON() ([]byte, error) {
 
 func (hg HostGroup) MarshalJSON() ([]byte, error) {
 	type attrs struct {
-		DisplayName  string `json:"display_name"`
+		DisplayName string `json:"display_name"`
 	}
 	type group struct {
 		Attrs attrs `json:"attrs"`

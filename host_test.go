@@ -2,6 +2,7 @@ package icinga
 
 import (
 	"encoding/json"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -35,4 +36,38 @@ func TestHostMarshal(t *testing.T) {
 		t.Fail()
 	}
 	t.Log("want", want, "got", got)
+}
+
+func TestHostUnmarshal(t *testing.T) {
+	want := Host{
+		Name:            "example.com",
+		Address:         "",
+		Groups:          []string{"example"},
+		State:           HostDown,
+		StateType:       StateSoft,
+		CheckCommand:    "hostalive",
+		DisplayName:     "example.com",
+		Acknowledgement: false,
+	}
+	f, err := os.Open("testdata/hosts.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	resp, err := parseResponse(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got Host
+	for _, r := range resp.Results {
+		h := r.(Host)
+		if h.Name == "example.com" {
+			got = h
+			break
+		}
+	}
+	if !reflect.DeepEqual(want, got) {
+		t.Fail()
+	}
+	t.Logf("want %+v, got %+v", want, got)
 }

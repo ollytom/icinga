@@ -19,6 +19,7 @@ type Service struct {
 	CheckCommand    string      `json:"check_command"`
 	DisplayName     string      `json:"display_name"`
 	LastCheckResult CheckResult `json:"last_check_result"`
+	Acknowledgement bool
 }
 
 type CheckResult struct {
@@ -59,4 +60,22 @@ func (s Service) MarshalJSON() ([]byte, error) {
 		Attrs map[string]interface{} `json:"attrs"`
 	}{Attrs: attrs}
 	return json.Marshal(jservice)
+}
+
+// UnmarshalJSON unmarshals service attributes into more meaningful Service field types.
+func (s *Service) UnmarshalJSON(data []byte) error {
+	type alias Service
+	aux := &struct {
+		Acknowledgement int
+		*alias
+	}{
+		alias: (*alias)(s),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	if aux.Acknowledgement != 0 {
+		s.Acknowledgement = true
+	}
+	return nil
 }

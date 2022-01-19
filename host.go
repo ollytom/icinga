@@ -5,14 +5,15 @@ import "encoding/json"
 // Host represents a Host object. To create a Host, the Name and CheckCommand
 // fields must be set.
 type Host struct {
-	Name         string    `json:"name"`
-	Address      string    `json:"address"`
-	Address6     string    `json:"address6"`
-	Groups       []string  `json:"groups"`
-	State        HostState `json:"state"`
-	StateType    StateType `json:"state_type"`
-	CheckCommand string    `json:"check_command"`
-	DisplayName  string    `json:"display_name"`
+	Name            string    `json:"name"`
+	Address         string    `json:"address"`
+	Address6        string    `json:"address6"`
+	Groups          []string  `json:"groups"`
+	State           HostState `json:"state"`
+	StateType       StateType `json:"state_type"`
+	CheckCommand    string    `json:"check_command"`
+	DisplayName     string    `json:"display_name"`
+	Acknowledgement bool
 }
 
 type HostGroup struct {
@@ -68,6 +69,24 @@ func (h Host) MarshalJSON() ([]byte, error) {
 	m := make(map[string]interface{})
 	m["attrs"] = attrs
 	return json.Marshal(m)
+}
+
+// UnmarhsalJSON unmarshals host attributes into more meaningful Host field types.
+func (h *Host) UnmarshalJSON(data []byte) error {
+	type alias Host
+	aux := &struct {
+		Acknowledgement int
+		*alias
+	}{
+		alias: (*alias)(h),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	if aux.Acknowledgement != 0 {
+		h.Acknowledgement = true
+	}
+	return nil
 }
 
 func (hg HostGroup) MarshalJSON() ([]byte, error) {

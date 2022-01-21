@@ -42,10 +42,6 @@ func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	if expr != "" && resp.StatusCode == http.StatusNotFound {
-		return nil, ErrNoMatch
-
-	}
 	iresp, err := parseResponse(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("parse response: %v", err)
@@ -53,6 +49,8 @@ func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
 		return nil, iresp.Error
 	} else if resp.StatusCode != http.StatusOK {
 		return nil, errors.New(resp.Status)
+	} else if len(iresp.Results) == 0 {
+		return nil, ErrNoMatch
 	}
 	return iresp.Results, nil
 }

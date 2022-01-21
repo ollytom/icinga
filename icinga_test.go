@@ -188,3 +188,18 @@ func TestCreateService(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestNonExistentService(t *testing.T) {
+	client, err := newTestClient()
+	if err != nil {
+		t.Skipf("no local test icinga? got: %v", err)
+	}
+
+	filter := `match("blablabla", service.name)`
+	service, err := client.Services(filter)
+	if err == nil {
+		t.Fail()
+	}
+	t.Logf("lookup %s: %v", name, err)
+	t.Logf("%+v", service)
+}

@@ -4,13 +4,13 @@
 func (c *Client) TYPEs(filter string) ([]TYPE, error) {
 	objects, err := c.filterObjects("/objects/PLURAL", filter)
 	if err != nil {
-		return nil, fmt.Errorf("get PLURAL filter %q: %w", filter, err)
+		return nil, fmt.Errorf("get PLURAL filter %s: %w", filter, err)
 	}
 	var PLURAL []TYPE
 	for _, o := range objects {
 		v, ok := o.(TYPE)
 		if !ok {
-			return nil, fmt.Errorf("get PLURAL filter %q: %T in response", filter, v)
+			return nil, fmt.Errorf("get PLURAL filter %s: %T in response", filter, v)
 		}
 		PLURAL = append(PLURAL, v)
 	}

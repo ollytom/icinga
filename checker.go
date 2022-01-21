@@ -82,7 +82,7 @@ func (c *Client) CheckServices(filter string) error {
 		Expr: filter,
 	}
 	if err := scheduleCheck(c, f); err != nil {
-		return fmt.Errorf("check services %q: %w", filter, err)
+		return fmt.Errorf("check services %s: %w", filter, err)
 	}
 	return nil
 }
@@ -95,7 +95,7 @@ func (c *Client) CheckHosts(filter string) error {
 		Expr: filter,
 	}
 	if err := scheduleCheck(c, f); err != nil {
-		return fmt.Errorf("check hosts %q: %w", filter, err)
+		return fmt.Errorf("check hosts %s: %w", filter, err)
 	}
 	return nil
 }

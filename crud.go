@@ -10,13 +10,13 @@ import "fmt"
 func (c *Client) Hosts(filter string) ([]Host, error) {
 	objects, err := c.filterObjects("/objects/hosts", filter)
 	if err != nil {
-		return nil, fmt.Errorf("get hosts filter %q: %w", filter, err)
+		return nil, fmt.Errorf("get hosts filter %s: %w", filter, err)
 	}
 	var hosts []Host
 	for _, o := range objects {
 		v, ok := o.(Host)
 		if !ok {
-			return nil, fmt.Errorf("get hosts filter %q: %T in response", filter, v)
+			return nil, fmt.Errorf("get hosts filter %s: %T in response", filter, v)
 		}
 		hosts = append(hosts, v)
 	}
@@ -61,13 +61,13 @@ func (c *Client) DeleteHost(name string, cascade bool) error {
 func (c *Client) Services(filter string) ([]Service, error) {
 	objects, err := c.filterObjects("/objects/services", filter)
 	if err != nil {
-		return nil, fmt.Errorf("get services filter %q: %w", filter, err)
+		return nil, fmt.Errorf("get services filter %s: %w", filter, err)
 	}
 	var services []Service
 	for _, o := range objects {
 		v, ok := o.(Service)
 		if !ok {
-			return nil, fmt.Errorf("get services filter %q: %T in response", filter, v)
+			return nil, fmt.Errorf("get services filter %s: %T in response", filter, v)
 		}
 		services = append(services, v)
 	}
@@ -112,13 +112,13 @@ func (c *Client) DeleteService(name string, cascade bool) error {
 func (c *Client) Users(filter string) ([]User, error) {
 	objects, err := c.filterObjects("/objects/users", filter)
 	if err != nil {
-		return nil, fmt.Errorf("get users filter %q: %w", filter, err)
+		return nil, fmt.Errorf("get users filter %s: %w", filter, err)
 	}
 	var users []User
 	for _, o := range objects {
 		v, ok := o.(User)
 		if !ok {
-			return nil, fmt.Errorf("get users filter %q: %T in response", filter, v)
+			return nil, fmt.Errorf("get users filter %s: %T in response", filter, v)
 		}
 		users = append(users, v)
 	}
@@ -163,13 +163,13 @@ func (c *Client) DeleteUser(name string, cascade bool) error {
 func (c *Client) HostGroups(filter string) ([]HostGroup, error) {
 	objects, err := c.filterObjects("/objects/hostgroups", filter)
 	if err != nil {
-		return nil, fmt.Errorf("get hostgroups filter %q: %w", filter, err)
+		return nil, fmt.Errorf("get hostgroups filter %s: %w", filter, err)
 	}
 	var hostgroups []HostGroup
 	for _, o := range objects {
 		v, ok := o.(HostGroup)
 		if !ok {
-			return nil, fmt.Errorf("get hostgroups filter %q: %T in response", filter, v)
+			return nil, fmt.Errorf("get hostgroups filter %s: %T in response", filter, v)
 		}
 		hostgroups = append(hostgroups, v)
 	}

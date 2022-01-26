@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 const versionPrefix = "/v1"
@@ -29,15 +30,22 @@ func NewRequest(method, url, username, password string, body io.Reader) (*http.R
 	return req, nil
 }
 
+// filterEncode url-encodes the filter expression expr in the required
+// format to be included in a request. Notably, spaces need to be encoded
+// as "%20", not "+" as returned by the url package.
+func filterEncode(expr string) string {
+	v := url.Values{}
+	v.Set("filter", expr)
+	return strings.ReplaceAll(v.Encode(), "+", "%20")
+}
+
 func (c *Client) get(path, filter string) (*http.Response, error) {
 	u, err := url.Parse("https://" + c.addr + versionPrefix + path)
 	if err != nil {
 		return nil, err
 	}
 	if filter != "" {
-		v := url.Values{}
-		v.Set("filter", filter)
-		u.RawQuery = v.Encode()
+		u.RawQuery = filterEncode(filter)
 	}
 	req, err := NewRequest(http.MethodGet, u.String(), c.username, c.password, nil)
 	if err != nil {

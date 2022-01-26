@@ -200,6 +200,6 @@ func TestNonExistentService(t *testing.T) {
 	if err == nil {
 		t.Fail()
 	}
-	t.Logf("lookup %s: %v", name, err)
+	t.Log(err)
 	t.Logf("%+v", service)
 }

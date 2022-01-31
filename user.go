@@ -10,11 +10,6 @@ type User struct {
 	Groups []string
 }
 
-var testUser = User{
-	Name:  "testUser",
-	Email: "test@example.com",
-}
-
 func (u User) MarshalJSON() ([]byte, error) {
 	type attrs struct {
 		Email  string   `json:"email"`

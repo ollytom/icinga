@@ -56,24 +56,28 @@ func parseResponse(r io.Reader) (*response, error) {
 		switch r.Type {
 		case "Host":
 			var h Host
+			h.Name = r.Name
 			if err := json.Unmarshal(r.Attrs, &h); err != nil {
 				return nil, err
 			}
 			resp.Results = append(resp.Results, h)
 		case "Service":
 			var s Service
+			s.Name = r.Name
 			if err := json.Unmarshal(r.Attrs, &s); err != nil {
 				return nil, err
 			}
 			resp.Results = append(resp.Results, s)
 		case "User":
 			var u User
+			u.Name = r.Name
 			if err := json.Unmarshal(r.Attrs, &u); err != nil {
 				return nil, err
 			}
 			resp.Results = append(resp.Results, u)
 		case "HostGroup":
 			var h HostGroup
+			h.Name = r.Name
 			if err := json.Unmarshal(r.Attrs, &h); err != nil {
 				return nil, err
 			}

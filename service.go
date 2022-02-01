@@ -12,14 +12,14 @@ func (s Service) path() string {
 
 // Service represents a Service object.
 type Service struct {
-	Name            string `json:"__name"`
-	Groups          []string
+	Name            string   `json:"-"`
+	Groups          []string `json:"groups,omitempty"`
 	State           ServiceState
 	StateType       StateType   `json:"state_type"`
 	CheckCommand    string      `json:"check_command"`
-	DisplayName     string      `json:"display_name"`
-	LastCheckResult CheckResult `json:"last_check_result"`
-	Acknowledgement bool
+	DisplayName     string      `json:"display_name,omitempty"`
+	LastCheckResult CheckResult `json:"last_check_result,omitempty"`
+	Acknowledgement bool        `json:",omitempty"`
 }
 
 type CheckResult struct {

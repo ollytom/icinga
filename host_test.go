@@ -8,9 +8,9 @@ import (
 )
 
 func TestHostMarshal(t *testing.T) {
-	s := `{"attrs":{"address":"192.0.2.1","address6":"2001:db8::","groups":["test"],"check_command":"dummy","display_name":"Example host"}}`
+	b := []byte(`{"attrs":{"address":"192.0.2.1","address6":"2001:db8::","check_command":"dummy","display_name":"Example host","groups":["test"]}}`)
 	want := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(s), &want); err != nil {
+	if err := json.Unmarshal(b, &want); err != nil {
 		t.Fatal(err)
 	}
 
@@ -19,7 +19,6 @@ func TestHostMarshal(t *testing.T) {
 		Address:      "192.0.2.1",
 		Address6:     "2001:db8::",
 		Groups:       []string{"test"},
-		State:        HostDown,
 		StateType:    StateSoft,
 		CheckCommand: "dummy",
 		DisplayName:  "Example host",
@@ -27,11 +26,11 @@ func TestHostMarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Log(string(p))
 	got := make(map[string]interface{})
 	if err := json.Unmarshal(p, &got); err != nil {
 		t.Fatal(err)
 	}
-
 	if !reflect.DeepEqual(want, got) {
 		t.Fail()
 	}

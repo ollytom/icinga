@@ -5,19 +5,19 @@ import "encoding/json"
 // Host represents a Host object. To create a Host, the Name and CheckCommand
 // fields must be set.
 type Host struct {
-	Name            string    `json:"name"`
+	Name            string    `json:"-"`
 	Address         string    `json:"address"`
 	Address6        string    `json:"address6"`
-	Groups          []string  `json:"groups"`
-	State           HostState `json:"state"`
-	StateType       StateType `json:"state_type"`
+	Groups          []string  `json:"groups,omitempty"`
+	State           HostState `json:"state,omitempty"`
+	StateType       StateType `json:"state_type,omitempty"`
 	CheckCommand    string    `json:"check_command"`
-	DisplayName     string    `json:"display_name"`
-	Acknowledgement bool
+	DisplayName     string    `json:"display_name,omitempty"`
+	Acknowledgement bool      `json:",omitempty"`
 }
 
 type HostGroup struct {
-	Name        string `json:"name"`
+	Name        string `json:"-"`
 	DisplayName string `json:"display_name"`
 }
 
@@ -58,17 +58,9 @@ func (hg HostGroup) path() string {
 }
 
 func (h Host) MarshalJSON() ([]byte, error) {
-	attrs := make(map[string]interface{})
-	attrs["address"] = h.Address
-	attrs["address6"] = h.Address6
-	if len(h.Groups) > 0 {
-		attrs["groups"] = h.Groups
-	}
-	attrs["check_command"] = h.CheckCommand
-	attrs["display_name"] = h.DisplayName
-	m := make(map[string]interface{})
-	m["attrs"] = attrs
-	return json.Marshal(m)
+	type alias Host
+	a := alias(h)
+	return json.Marshal(map[string]interface{}{"attrs": a})
 }
 
 // UnmarhsalJSON unmarshals host attributes into more meaningful Host field types.
@@ -90,15 +82,7 @@ func (h *Host) UnmarshalJSON(data []byte) error {
 }
 
 func (hg HostGroup) MarshalJSON() ([]byte, error) {
-	type attrs struct {
-		DisplayName string `json:"display_name"`
-	}
-	type group struct {
-		Attrs attrs `json:"attrs"`
-	}
-	return json.Marshal(&group{
-		Attrs: attrs{
-			DisplayName: hg.DisplayName,
-		},
-	})
+	type alias HostGroup
+	a := alias(hg)
+	return json.Marshal(map[string]interface{}{"attrs": a})
 }

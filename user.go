@@ -5,24 +5,15 @@ import "encoding/json"
 // User represents a User object.
 // Note that this is different from an ApiUser.
 type User struct {
-	Name   string
-	Email  string
-	Groups []string
+	Name   string   `json:"-"`
+	Email  string   `json:"email,omitempty"`
+	Groups []string `json:"groups,omitempty"`
 }
 
 func (u User) MarshalJSON() ([]byte, error) {
-	type attrs struct {
-		Email  string   `json:"email"`
-		Groups []string `json:"groups,omitempty"`
-	}
-	return json.Marshal(&struct {
-		Attrs attrs `json:"attrs"`
-	}{
-		Attrs: attrs{
-			Email:  u.Email,
-			Groups: u.Groups,
-		},
-	})
+	type alias User
+	a := alias(u)
+	return json.Marshal(map[string]interface{}{"attrs": a})
 }
 
 func (u User) name() string {

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -17,6 +18,29 @@ type object interface {
 //go:generate ./crud.sh -o crud.go
 
 func (c *Client) lookupObject(objpath string) (object, error) {
+	return lookup(c, objpath)
+}
+
+func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
+	return filter(c, objpath, expr)
+}
+
+func (c *Client) createObject(obj object) error {
+	return create(c, obj)
+}
+
+func (c *Client) deleteObject(objpath string, cascade bool) error {
+	return delete(c, objpath, cascade)
+}
+
+type client interface {
+	get(path, filter string) (*http.Response, error)
+	post(path string, body io.Reader) (*http.Response, error)
+	put(path string, body io.Reader) (*http.Response, error)
+	delete(path string, cascade bool) (*http.Response, error)
+}
+
+func lookup(c client, objpath string) (object, error) {
 	resp, err := c.get(objpath, "")
 	if err != nil {
 		return nil, err
@@ -36,7 +60,7 @@ func (c *Client) lookupObject(objpath string) (object, error) {
 	return objectFromLookup(iresp)
 }
 
-func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
+func filter(c client, objpath, expr string) ([]object, error) {
 	resp, err := c.get(objpath, expr)
 	if err != nil {
 		return nil, err
@@ -55,7 +79,7 @@ func (c *Client) filterObjects(objpath, expr string) ([]object, error) {
 	return iresp.Results, nil
 }
 
-func (c *Client) createObject(obj object) error {
+func create(c client, obj object) error {
 	buf := &bytes.Buffer{}
 	switch v := obj.(type) {
 	case Host, Service, User, HostGroup:
@@ -83,7 +107,7 @@ func (c *Client) createObject(obj object) error {
 	return iresp.Error
 }
 
-func (c *Client) deleteObject(objpath string, cascade bool) error {
+func delete(c client, objpath string, cascade bool) error {
 	resp, err := c.delete(objpath, cascade)
 	if err != nil {
 		return err

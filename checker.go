@@ -111,16 +111,16 @@ func scheduleCheck(c *Client, filter checkFilter) error {
 	}
 	if resp.StatusCode == http.StatusOK {
 		return nil
-	} else if resp.StatusCode == http.StatusNotFound {
-		return ErrNoMatch
 	}
+
 	defer resp.Body.Close()
 	iresp, err := parseResponse(resp.Body)
 	if err != nil {
 		return fmt.Errorf("parse response: %v", err)
-	}
-	if iresp.Error != nil {
+	} else if iresp.Error != nil {
 		return iresp.Error
+	} else if len(iresp.Results) == 0 {
+		return ErrNoMatch
 	}
 	return fmt.Errorf("%s", resp.Status)
 }

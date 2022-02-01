@@ -8,17 +8,22 @@ import (
 	"reflect"
 	"sort"
 	"testing"
+	"time"
 
 	"olowe.co/icinga"
 )
 
-func randomHostname() string {
+func init() {
+	rand.Seed(time.Now().Unix())
+}
+
+func randomHostname(suffix string) string {
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 	b := make([]rune, 8)
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
-	return string(b) + ".example.org"
+	return string(b) + suffix
 }
 
 func createTestHosts(c *icinga.Client) ([]icinga.Host, error) {
@@ -30,7 +35,7 @@ func createTestHosts(c *icinga.Client) ([]icinga.Host, error) {
 	var hosts []icinga.Host
 	for i := 0; i < 5; i++ {
 		h := icinga.Host{
-			Name:         randomHostname(),
+			Name:         randomHostname(".example.org"),
 			CheckCommand: "random",
 			Groups:       []string{hostgroup.Name},
 		}
@@ -54,8 +59,8 @@ func compareStringSlice(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for i, v := range a {
-		if v != b[i] {
+	for i := range a {
+		if a[i] != b[i] {
 			return false
 		}
 	}
@@ -78,7 +83,7 @@ func TestFilter(t *testing.T) {
 	}
 	defer func() {
 		for _, h := range hosts {
-			if err := client.DeleteHost(h.Name, false); err != nil {
+			if err := client.DeleteHost(h.Name, true); err != nil {
 				t.Log(err)
 			}
 		}
@@ -127,11 +132,25 @@ func TestChecker(t *testing.T) {
 		t.Skipf("no local test icinga? got: %v", err)
 	}
 
-	s := icinga.Service{Name: "9p.io!http"}
+	h := icinga.Host{
+		Name:         randomHostname(".checker.example.com"),
+		CheckCommand: "hostalive",
+	}
+	if err := client.CreateHost(h); err != nil {
+		t.Fatal(err)
+	}
+
+	s := icinga.Service{
+		Name:         h.Name + "!http",
+		CheckCommand: "http",
+	}
+	if err := client.CreateService(s); err != nil {
+		t.Fatal(err)
+	}
 	if err := s.Check(client); err != nil {
 		t.Fatal(err)
 	}
-	s, err = client.LookupService("9p.io!http")
+	s, err = client.LookupService(h.Name + "!http")
 	if err != nil {
 		t.Fatal(err)
 	}

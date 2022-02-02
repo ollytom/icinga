@@ -9,7 +9,7 @@ import (
 
 func TestUser(t *testing.T) {
 	want := User{Name: "test", Email: "test@example.com", Groups: []string{}}
-	f, err := os.Open("testdata/users.json")
+	f, err := os.Open("testdata/objects/users/test")
 	if err != nil {
 		t.Fatal(err)
 	}

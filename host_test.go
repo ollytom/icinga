@@ -26,29 +26,27 @@ func TestHostMarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(string(p))
 	got := make(map[string]interface{})
 	if err := json.Unmarshal(p, &got); err != nil {
 		t.Fatal(err)
 	}
 	if !reflect.DeepEqual(want, got) {
-		t.Fail()
+		t.Error("want", want, "got", got)
 	}
-	t.Log("want", want, "got", got)
 }
 
 func TestHostUnmarshal(t *testing.T) {
 	want := Host{
-		Name:            "example.com",
+		Name:            "VuS9jZ8u.example.org",
 		Address:         "",
-		Groups:          []string{"example"},
+		Groups:          []string{},
 		State:           HostDown,
 		StateType:       StateSoft,
 		CheckCommand:    "hostalive",
-		DisplayName:     "example.com",
+		DisplayName:     "VuS9jZ8u.example.org",
 		Acknowledgement: false,
 	}
-	f, err := os.Open("testdata/hosts.json")
+	f, err := os.Open("testdata/objects/hosts/VuS9jZ8u.example.org")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,16 +55,8 @@ func TestHostUnmarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var got Host
-	for _, r := range resp.Results {
-		h := r.(Host)
-		if h.Name == "example.com" {
-			got = h
-			break
-		}
-	}
+	got := resp.Results[0].(Host)
 	if !reflect.DeepEqual(want, got) {
-		t.Fail()
+		t.Errorf("want %+v, got %+v", want, got)
 	}
-	t.Logf("want %+v, got %+v", want, got)
 }

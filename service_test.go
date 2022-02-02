@@ -8,7 +8,7 @@ import (
 )
 
 func TestServiceUnmarshal(t *testing.T) {
-	f, err := os.Open("testdata/services.json")
+	f, err := os.Open("testdata/objects/services/9p.io!http")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func TestServiceUnmarshal(t *testing.T) {
 		CheckCommand: "http",
 		DisplayName:  "http",
 		LastCheckResult: CheckResult{
-			Output: "HTTP OK: HTTP/1.1 200 OK - 1714 bytes in 0.703 second response time ",
+			Output: "HTTP OK: HTTP/1.1 200 OK - 1714 bytes in 1.083 second response time ",
 		},
 	}
 	var got Service
@@ -35,9 +35,8 @@ func TestServiceUnmarshal(t *testing.T) {
 		}
 	}
 	if !reflect.DeepEqual(want, got) {
-		t.Fail()
+		t.Errorf("want %+v, got %+v", want, got)
 	}
-	t.Logf("want %+v, got %+v", want, got)
 }
 
 func TestServiceMarshal(t *testing.T) {
@@ -59,7 +58,6 @@ func TestServiceMarshal(t *testing.T) {
 	}
 	got := string(b)
 	if want != got {
-		t.Fail()
+		t.Error("want", want, "got", got)
 	}
-	t.Log("want", want, "got", got)
 }

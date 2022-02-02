@@ -8,7 +8,7 @@ import "fmt"
 // If no hosts match, error wraps ErrNoMatch.
 // To fetch all host, set filter to the empty string ("").
 func (c *Client) Hosts(filter string) ([]Host, error) {
-	objects, err := filter(c, "/objects/hosts", filter)
+	objects, err := c.filterObjects("/objects/hosts", filter)
 	if err != nil {
 		return nil, fmt.Errorf("get hosts filter %s: %w", filter, err)
 	}
@@ -26,7 +26,7 @@ func (c *Client) Hosts(filter string) ([]Host, error) {
 // LookupHost returns the Host identified by name. If no Host is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupHost(name string) (Host, error) {
-	obj, err := lookup(c, "/objects/hosts/"+name)
+	obj, err := c.lookupObject("/objects/hosts/" + name)
 	if err != nil {
 		return Host{}, fmt.Errorf("lookup host %s: %w", name, err)
 	}
@@ -40,7 +40,7 @@ func (c *Client) LookupHost(name string) (Host, error) {
 // CreateHost creates host. Some fields of host must be set for successful
 // creation; see the type definition of Host for details.
 func (c *Client) CreateHost(host Host) error {
-	if err := create(c, host); err != nil {
+	if err := c.createObject(host); err != nil {
 		return fmt.Errorf("create host %s: %w", host.Name, err)
 	}
 	return nil
@@ -50,7 +50,7 @@ func (c *Client) CreateHost(host Host) error {
 // depending on the Host are also deleted. If no Host is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteHost(name string, cascade bool) error {
-	if err := delete(c, "/objects/hosts/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/hosts/"+name, cascade); err != nil {
 		return fmt.Errorf("delete host %s: %w", name, err)
 	}
 	return nil
@@ -59,7 +59,7 @@ func (c *Client) DeleteHost(name string, cascade bool) error {
 // If no services match, error wraps ErrNoMatch.
 // To fetch all service, set filter to the empty string ("").
 func (c *Client) Services(filter string) ([]Service, error) {
-	objects, err := filter(c, "/objects/services", filter)
+	objects, err := c.filterObjects("/objects/services", filter)
 	if err != nil {
 		return nil, fmt.Errorf("get services filter %s: %w", filter, err)
 	}
@@ -77,7 +77,7 @@ func (c *Client) Services(filter string) ([]Service, error) {
 // LookupService returns the Service identified by name. If no Service is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupService(name string) (Service, error) {
-	obj, err := lookup(c, "/objects/services/"+name)
+	obj, err := c.lookupObject("/objects/services/" + name)
 	if err != nil {
 		return Service{}, fmt.Errorf("lookup service %s: %w", name, err)
 	}
@@ -91,7 +91,7 @@ func (c *Client) LookupService(name string) (Service, error) {
 // CreateService creates service. Some fields of service must be set for successful
 // creation; see the type definition of Service for details.
 func (c *Client) CreateService(service Service) error {
-	if err := create(c, service); err != nil {
+	if err := c.createObject(service); err != nil {
 		return fmt.Errorf("create service %s: %w", service.Name, err)
 	}
 	return nil
@@ -101,7 +101,7 @@ func (c *Client) CreateService(service Service) error {
 // depending on the Service are also deleted. If no Service is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteService(name string, cascade bool) error {
-	if err := delete(c, "/objects/services/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/services/"+name, cascade); err != nil {
 		return fmt.Errorf("delete service %s: %w", name, err)
 	}
 	return nil
@@ -110,7 +110,7 @@ func (c *Client) DeleteService(name string, cascade bool) error {
 // If no users match, error wraps ErrNoMatch.
 // To fetch all user, set filter to the empty string ("").
 func (c *Client) Users(filter string) ([]User, error) {
-	objects, err := filter(c, "/objects/users", filter)
+	objects, err := c.filterObjects("/objects/users", filter)
 	if err != nil {
 		return nil, fmt.Errorf("get users filter %s: %w", filter, err)
 	}
@@ -128,7 +128,7 @@ func (c *Client) Users(filter string) ([]User, error) {
 // LookupUser returns the User identified by name. If no User is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupUser(name string) (User, error) {
-	obj, err := lookup(c, "/objects/users/"+name)
+	obj, err := c.lookupObject("/objects/users/" + name)
 	if err != nil {
 		return User{}, fmt.Errorf("lookup user %s: %w", name, err)
 	}
@@ -142,7 +142,7 @@ func (c *Client) LookupUser(name string) (User, error) {
 // CreateUser creates user. Some fields of user must be set for successful
 // creation; see the type definition of User for details.
 func (c *Client) CreateUser(user User) error {
-	if err := create(c, user); err != nil {
+	if err := c.createObject(user); err != nil {
 		return fmt.Errorf("create user %s: %w", user.Name, err)
 	}
 	return nil
@@ -152,7 +152,7 @@ func (c *Client) CreateUser(user User) error {
 // depending on the User are also deleted. If no User is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteUser(name string, cascade bool) error {
-	if err := delete(c, "/objects/users/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/users/"+name, cascade); err != nil {
 		return fmt.Errorf("delete user %s: %w", name, err)
 	}
 	return nil
@@ -161,7 +161,7 @@ func (c *Client) DeleteUser(name string, cascade bool) error {
 // If no hostgroups match, error wraps ErrNoMatch.
 // To fetch all hostgroup, set filter to the empty string ("").
 func (c *Client) HostGroups(filter string) ([]HostGroup, error) {
-	objects, err := filter(c, "/objects/hostgroups", filter)
+	objects, err := c.filterObjects("/objects/hostgroups", filter)
 	if err != nil {
 		return nil, fmt.Errorf("get hostgroups filter %s: %w", filter, err)
 	}
@@ -179,7 +179,7 @@ func (c *Client) HostGroups(filter string) ([]HostGroup, error) {
 // LookupHostGroup returns the HostGroup identified by name. If no HostGroup is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupHostGroup(name string) (HostGroup, error) {
-	obj, err := lookup(c, "/objects/hostgroups/"+name)
+	obj, err := c.lookupObject("/objects/hostgroups/" + name)
 	if err != nil {
 		return HostGroup{}, fmt.Errorf("lookup hostgroup %s: %w", name, err)
 	}
@@ -193,7 +193,7 @@ func (c *Client) LookupHostGroup(name string) (HostGroup, error) {
 // CreateHostGroup creates hostgroup. Some fields of hostgroup must be set for successful
 // creation; see the type definition of HostGroup for details.
 func (c *Client) CreateHostGroup(hostgroup HostGroup) error {
-	if err := create(c, hostgroup); err != nil {
+	if err := c.createObject(hostgroup); err != nil {
 		return fmt.Errorf("create hostgroup %s: %w", hostgroup.Name, err)
 	}
 	return nil
@@ -203,7 +203,7 @@ func (c *Client) CreateHostGroup(hostgroup HostGroup) error {
 // depending on the HostGroup are also deleted. If no HostGroup is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteHostGroup(name string, cascade bool) error {
-	if err := delete(c, "/objects/hostgroups/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/hostgroups/"+name, cascade); err != nil {
 		return fmt.Errorf("delete hostgroup %s: %w", name, err)
 	}
 	return nil

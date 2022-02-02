@@ -27,12 +27,7 @@ func TestServiceUnmarshal(t *testing.T) {
 			Output: "HTTP OK: HTTP/1.1 200 OK - 1714 bytes in 1.083 second response time ",
 		},
 	}
-	var got Service
-	for _, r := range resp.Results {
-		if r.name() == "9p.io!http" {
-			got = r.(Service)
-		}
-	}
+	got := resp.Results[0].(Service)
 	if !reflect.DeepEqual(want, got) {
 		t.Errorf("want %+v, got %+v", want, got)
 	}

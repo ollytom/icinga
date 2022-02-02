@@ -96,8 +96,5 @@ func Permissions(c *Client) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i := range apiresp.Results {
-		return apiresp.Results[i].Permissions, nil
-	}
-	return nil, errors.New("no permissions")
+	return apiresp.Results[0].Permissions, nil
 }

@@ -32,7 +32,6 @@ func TestUserMarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 	if string(got) != want {
-		t.Fail()
+		t.Errorf("want %s got %s", want, got)
 	}
-	t.Logf("want %s, got %s", want, got)
 }

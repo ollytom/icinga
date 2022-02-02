@@ -29,16 +29,14 @@ const (
 	HostUnreachable
 )
 
-func (s HostState) String() string {
-	switch s {
+func (state HostState) String() string {
+	switch state {
 	case HostUp:
 		return "HostUp"
 	case HostDown:
 		return "HostDown"
-	case HostUnreachable:
-		return "HostUnreachable"
 	}
-	return "unhandled host state"
+	return "HostUnreachable"
 }
 
 func (h Host) name() string {

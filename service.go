@@ -35,18 +35,16 @@ const (
 	ServiceUnknown
 )
 
-func (s ServiceState) String() string {
-	switch s {
+func (state ServiceState) String() string {
+	switch state {
 	case ServiceOK:
 		return "ServiceOK"
 	case ServiceWarning:
 		return "ServiceWarning"
 	case ServiceCritical:
 		return "ServiceCritical"
-	case ServiceUnknown:
-		return "ServiceUnknown"
 	}
-	return "unhandled service state"
+	return "ServiceUnknown"
 }
 
 func (s Service) MarshalJSON() ([]byte, error) {

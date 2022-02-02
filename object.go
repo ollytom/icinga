@@ -59,7 +59,9 @@ func (c *Client) createObject(obj object) error {
 	buf := &bytes.Buffer{}
 	switch v := obj.(type) {
 	case Host, Service, User, HostGroup:
-		if err := json.NewEncoder(buf).Encode(v); err != nil {
+		m := make(map[string]interface{})
+		m["attrs"] = v
+		if err := json.NewEncoder(buf).Encode(m); err != nil {
 			return err
 		}
 	default:

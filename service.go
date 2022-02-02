@@ -12,14 +12,14 @@ func (s Service) path() string {
 
 // Service represents a Service object.
 type Service struct {
-	Name            string   `json:"-"`
-	Groups          []string `json:"groups,omitempty"`
-	State           ServiceState
-	StateType       StateType   `json:"state_type"`
-	CheckCommand    string      `json:"check_command"`
-	DisplayName     string      `json:"display_name,omitempty"`
-	LastCheckResult CheckResult `json:"last_check_result,omitempty"`
-	Acknowledgement bool        `json:",omitempty"`
+	Name            string       `json:"-"`
+	Groups          []string     `json:"groups,omitempty"`
+	State           ServiceState `json:"state,omitempty"`
+	StateType       StateType    `json:"state_type,omitempty"`
+	CheckCommand    string       `json:"check_command"`
+	DisplayName     string       `json:"display_name,omitempty"`
+	LastCheckResult *CheckResult `json:"last_check_result,omitempty"`
+	Acknowledgement bool         `json:",omitempty"`
 }
 
 type CheckResult struct {
@@ -45,19 +45,6 @@ func (state ServiceState) String() string {
 		return "ServiceCritical"
 	}
 	return "ServiceUnknown"
-}
-
-func (s Service) MarshalJSON() ([]byte, error) {
-	attrs := make(map[string]interface{})
-	if len(s.Groups) > 0 {
-		attrs["groups"] = s.Groups
-	}
-	attrs["check_command"] = s.CheckCommand
-	attrs["display_name"] = s.DisplayName
-	jservice := &struct {
-		Attrs map[string]interface{} `json:"attrs"`
-	}{Attrs: attrs}
-	return json.Marshal(jservice)
 }
 
 // UnmarshalJSON unmarshals service attributes into more meaningful Service field types.

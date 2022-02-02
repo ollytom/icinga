@@ -55,12 +55,6 @@ func (hg HostGroup) path() string {
 	return "/objects/hostgroups/" + hg.Name
 }
 
-func (h Host) MarshalJSON() ([]byte, error) {
-	type alias Host
-	a := alias(h)
-	return json.Marshal(map[string]interface{}{"attrs": a})
-}
-
 // UnmarhsalJSON unmarshals host attributes into more meaningful Host field types.
 func (h *Host) UnmarshalJSON(data []byte) error {
 	type alias Host
@@ -77,10 +71,4 @@ func (h *Host) UnmarshalJSON(data []byte) error {
 		h.Acknowledgement = true
 	}
 	return nil
-}
-
-func (hg HostGroup) MarshalJSON() ([]byte, error) {
-	type alias HostGroup
-	a := alias(hg)
-	return json.Marshal(map[string]interface{}{"attrs": a})
 }

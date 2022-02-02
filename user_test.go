@@ -18,14 +18,7 @@ func TestUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	obj, err := objectFromLookup(resp)
-	if err != nil {
-		t.Fatal(err)
-	}
-	got, ok := obj.(User)
-	if !ok {
-		t.Fatalf("want %T, got %T", want, got)
-	}
+	got := resp.Results[0].(User)
 	if !reflect.DeepEqual(want, got) {
 		t.Errorf("want: %+v, got %+v", want, got)
 	}

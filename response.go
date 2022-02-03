@@ -24,17 +24,9 @@ type response struct {
 	Error   error
 }
 
-func parseAPIResponse(r io.Reader) (apiResponse, error) {
+func parseResponse(r io.Reader) (*response, error) {
 	var apiresp apiResponse
 	if err := json.NewDecoder(r).Decode(&apiresp); err != nil {
-		return apiResponse{}, err
-	}
-	return apiresp, nil
-}
-
-func parseResponse(r io.Reader) (*response, error) {
-	apiresp, err := parseAPIResponse(r)
-	if err != nil {
 		return nil, err
 	}
 	// Confusingly the top-level status field in an API response contains

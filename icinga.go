@@ -50,6 +50,7 @@
 package icinga
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 )
@@ -92,8 +93,8 @@ func Permissions(c *Client) ([]string, error) {
 		return nil, errors.New(resp.Status)
 	}
 	defer resp.Body.Close()
-	apiresp, err := parseAPIResponse(resp.Body)
-	if err != nil {
+	var apiresp apiResponse
+	if err := json.NewDecoder(resp.Body).Decode(&apiresp); err != nil {
 		return nil, err
 	}
 	return apiresp.Results[0].Permissions, nil

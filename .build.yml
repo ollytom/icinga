@@ -1,0 +1,18 @@
+image: openbsd/latest
+packages:
+  - go
+  - icinga2
+sources:
+  - https://git.sr.ht/~otl/icinga
+tasks:
+  - icinga_setup: |
+      doas icinga2 api setup
+      doas tee /etc/icinga2/conf.d/api-users.conf <<EOF
+      object ApiUser "icinga" {
+        password = name
+        permissions = ["*"]
+      }
+      EOF
+      doas rcctl enable icinga2
+      doas rcctl start icinga2
+  - test: cd icinga && go test

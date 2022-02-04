@@ -32,18 +32,24 @@ For those unfamiliar with this workflow, see [git-send-email.io][sendemail].
 
 ### Tests
 
-Some tests dial an instance of Icinga2 running on the loopback address
-and the standard Icinga2 port 5665 ("127.0.0.1:5665"). If this fails,
-those tests are skipped. To run these tests, create the following API
-user:
+Some tests use a fake, in-process Icinga server. Not all features of
+the API are implemented, but on any unsupported request it should
+report an error. The fake server uses an in-memory map to store
+Icinga2 objects, which maps object's path in the API request (e.g.
+"objects/hosts/text.example.com") to the object's attributes (e.g.
+`check_command` and `display_name`).
 
-	object ApiUser "root" {
-		password = "icinga"
+Some tests dial an instance of Icinga2 running on the loopback address
+and the standard Icinga2 port 5665 (`::1:5665`). If this fails, those
+tests are skipped. To run these tests, create the following API user:
+
+	object ApiUser "icinga" {
+		password = name
 		permissions = [ "*" ]
 	}
 
-Getting data from 127.0.0.1:5665 to an Icinga server is left as an
-exercise to the reader!
+Getting data from the loopback interface to an Icinga server is left
+as an exercise to the reader!
 
 Personally, I run an Alpine Linux virtual machine using qemu. You
 could also use the [official Icinga2 container image][image].

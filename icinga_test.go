@@ -39,7 +39,6 @@ func randomHosts(n int, suffix string) []icinga.Host {
 		h := icinga.Host{
 			Name:         randomHostname(suffix),
 			CheckCommand: "random",
-			Groups:       []string{"example"},
 			Address:      randomTestAddr(),
 		}
 		hosts = append(hosts, h)

@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path"
 	"reflect"
 	"sort"
@@ -239,12 +237,13 @@ func (srv *fakeServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (f *fakeServer) Permissions(w http.ResponseWriter) {
-	file, err := os.Open("testdata/permissions.json")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	io.Copy(w, file)
+	fmt.Fprint(w, `{"results": [{
+		"info": "Fake Icinga2 server",
+		"permissions": ["*"],
+		"user": "icinga",
+		"version": "fake"
+	}]}`)
+
 }
 
 type apiResponse struct {
@@ -253,8 +252,8 @@ type apiResponse struct {
 }
 
 type apiResult struct {
-	Name  string                 `json:"name"`
-	Type  string                 `json:"type"`
+	Name  string     `json:"name"`
+	Type  string     `json:"type"`
 	Attrs attributes `json:"attrs"`
 }
 
@@ -307,8 +306,8 @@ func (srv *fakeServer) GetObject(w http.ResponseWriter, req *http.Request) {
 	resp := apiResponse{
 		Results: []apiResult{
 			apiResult{
-				Name: path.Base(req.URL.Path),
-				Type: objType(req.URL.Path),
+				Name:  path.Base(req.URL.Path),
+				Type:  objType(req.URL.Path),
 				Attrs: attrs,
 			},
 		},

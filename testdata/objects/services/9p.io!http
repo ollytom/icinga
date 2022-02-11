@@ -3,7 +3,7 @@
         {
             "attrs": {
                 "__name": "9p.io!http",
-                "acknowledgement": 0,
+                "acknowledgement": 1,
                 "acknowledgement_expiry": 0,
                 "acknowledgement_last_change": 0,
                 "action_url": "",

@@ -23,7 +23,7 @@ type Service struct {
 	CheckCommand    string       `json:"check_command"`
 	DisplayName     string       `json:"display_name,omitempty"`
 	LastCheck       time.Time    `json:",omitempty"`
-	LastCheckResult *CheckResult `json:"last_check_result,omitempty"`
+	LastCheckResult CheckResult  `json:"last_check_result,omitempty"`
 	Acknowledgement bool         `json:",omitempty"`
 }
 

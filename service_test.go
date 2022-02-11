@@ -2,10 +2,11 @@ package icinga
 
 import (
 	"os"
-	"reflect"
 	"testing"
+	"time"
 )
 
+// Tests the trickier parts of the custom Unmarshaller functionality.
 func TestServiceUnmarshal(t *testing.T) {
 	f, err := os.Open("testdata/objects/services/9p.io!http")
 	if err != nil {
@@ -16,19 +17,35 @@ func TestServiceUnmarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := Service{
-		Name:         "9p.io!http",
-		Groups:       []string{},
-		State:        ServiceOK,
-		StateType:    StateHard,
-		CheckCommand: "http",
-		DisplayName:  "http",
-		LastCheckResult: &CheckResult{
-			Output: "HTTP OK: HTTP/1.1 200 OK - 1714 bytes in 1.083 second response time ",
+	svc := resp.Results[0].(Service)
+	if svc.LastCheck.IsZero() {
+		t.Error("zero time")
+	}
+	if !svc.Acknowledgement {
+		t.Error("should be acknowledged")
+	}
+	if t.Failed() {
+		t.Log(svc)
+	}
+}
+
+func TestServiceMarshalForCreate(t *testing.T) {
+	want := `{"attrs":{"check_command":"dummy","display_name":"test"}}`
+	service := Service{
+		CheckCommand: "dummy",
+		DisplayName:  "test",
+		LastCheck:    time.Now(),
+		LastCheckResult: CheckResult{
+			Output:      "xxx",
+			CheckSource: "xxx",
+			Command:     nil,
 		},
 	}
-	got := resp.Results[0].(Service)
-	if !reflect.DeepEqual(want, got) {
-		t.Errorf("want %+v, got %+v", want, got)
+	got, err := jsonForCreate(service)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want != string(got) {
+		t.Error("not matching", string(got))
 	}
 }

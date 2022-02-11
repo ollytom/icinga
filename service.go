@@ -1,6 +1,10 @@
 package icinga
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+	"time"
+)
 
 func (s Service) name() string {
 	return s.Name
@@ -18,12 +22,15 @@ type Service struct {
 	StateType       StateType    `json:"state_type,omitempty"`
 	CheckCommand    string       `json:"check_command"`
 	DisplayName     string       `json:"display_name,omitempty"`
+	LastCheck       time.Time    `json:",omitempty"`
 	LastCheckResult *CheckResult `json:"last_check_result,omitempty"`
 	Acknowledgement bool         `json:",omitempty"`
 }
 
 type CheckResult struct {
-	Output string
+	CheckSource string `json:"check_source"`
+	Command     interface{}
+	Output      string
 }
 
 type ServiceState int
@@ -52,6 +59,7 @@ func (s *Service) UnmarshalJSON(data []byte) error {
 	type alias Service
 	aux := &struct {
 		Acknowledgement int
+		LastCheck       float64 `json:"last_check"`
 		*alias
 	}{
 		alias: (*alias)(s),
@@ -62,5 +70,26 @@ func (s *Service) UnmarshalJSON(data []byte) error {
 	if aux.Acknowledgement != 0 {
 		s.Acknowledgement = true
 	}
+	s.LastCheck = time.Unix(int64(aux.LastCheck), 0)
 	return nil
+}
+
+func (s Service) Host() string {
+	return strings.SplitN(s.Name, "!", 2)[0]
+}
+
+func (cr CheckResult) RawCommand() string {
+	switch v := cr.Command.(type) {
+	case string:
+		return v
+	case []interface{}:
+		var cmd []string
+		for i := range v {
+			if arg, ok := v[i].(string); ok {
+				cmd = append(cmd, arg)
+			}
+		}
+		return strings.Join(cmd, " ")
+	}
+	return "no command"
 }

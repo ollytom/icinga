@@ -3,7 +3,7 @@
         {
             "attrs": {
                 "__name": "VuS9jZ8u.example.org",
-                "acknowledgement": 0,
+                "acknowledgement": 1,
                 "acknowledgement_expiry": 0,
                 "acknowledgement_last_change": 0,
                 "action_url": "",

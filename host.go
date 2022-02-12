@@ -1,6 +1,9 @@
 package icinga
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Host represents a Host object. To create a Host, the Name and CheckCommand
 // fields must be set.
@@ -13,6 +16,8 @@ type Host struct {
 	StateType       StateType `json:"state_type,omitempty"`
 	CheckCommand    string    `json:"check_command"`
 	DisplayName     string    `json:"display_name,omitempty"`
+	LastCheck time.Time `json:",omitempty"`
+	LastCheckResult CheckResult `json:"last_check_result,omitempty"`
 	Acknowledgement bool      `json:",omitempty"`
 }
 
@@ -60,6 +65,7 @@ func (h *Host) UnmarshalJSON(data []byte) error {
 	type alias Host
 	aux := &struct {
 		Acknowledgement int
+		LastCheck       float64 `json:"last_check"`
 		*alias
 	}{
 		alias: (*alias)(h),
@@ -70,5 +76,6 @@ func (h *Host) UnmarshalJSON(data []byte) error {
 	if aux.Acknowledgement != 0 {
 		h.Acknowledgement = true
 	}
+	h.LastCheck = time.Unix(int64(aux.LastCheck), 0)
 	return nil
 }

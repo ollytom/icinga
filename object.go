@@ -27,9 +27,8 @@ func jsonForCreate(obj object) ([]byte, error) {
 		m["attrs"] = v
 	case Host:
 		aux := &struct {
-			// fields not added to Host yet
-			// LastCheck struct{}
-			// LastCheckResult struct{}
+			LastCheck       *struct{} `json:",omitempty"`
+			LastCheckResult *struct{} `json:"last_check_result,omitempty"`
 			Host
 		}{Host: v}
 		m["attrs"] = aux

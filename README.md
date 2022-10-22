@@ -4,7 +4,7 @@ package icinga provides a client to the Icinga2 HTTP API.
 
 [![godocs.io](http://godocs.io/olowe.co/icinga?status.svg)](http://godocs.io/olowe.co/icinga)
 
-Send patches, questions or a friendly "hello" to the mailing list: [~otl/icinga@lists.sr.ht](mailto:~otl/icinga@lists.sr.ht) 🙂
+Send patches, questions or a friendly "hello" to the mailing list: [~otl/public-inbox@lists.sr.ht](mailto:~otl/public-inbox@lists.sr.ht)
 Or, read [the archives][list].
 
 ## Quick Start
@@ -23,13 +23,13 @@ Make some changes, then run the tests:
 
 	go test
 
-Please send any patches to the [mailing list](https://lists.sr.ht/~otl/icinga):
+Please send any patches to the [mailing list][list]:
 
-	git send-email --to="~otl/icinga@lists.sr.ht" HEAD^
+	git send-email --to="~otl/public-inbox@lists.sr.ht" HEAD^
 
 For those unfamiliar with this workflow, see [git-send-email.io][sendemail].
 
-[list]: https://lists.sr.ht/~otl/icinga
+[list]: https://lists.sr.ht/~otl/public-inbox
 [sendemail]: https://git-send-email.io
 
 ### Tests

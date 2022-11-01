@@ -58,8 +58,10 @@ func (state ServiceState) String() string {
 func (s *Service) UnmarshalJSON(data []byte) error {
 	type alias Service
 	aux := &struct {
-		Acknowledgement int
-		LastCheck       float64 `json:"last_check"`
+		Acknowledgement interface{} `json:"acknowledgement"`
+		State           interface{} `json:"state"`
+		StateType       interface{} `json:"state_type"`
+		LastCheck       float64     `json:"last_check"`
 		*alias
 	}{
 		alias: (*alias)(s),
@@ -67,8 +69,27 @@ func (s *Service) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	if aux.Acknowledgement != 0 {
-		s.Acknowledgement = true
+	switch v := aux.Acknowledgement.(type) {
+	case int:
+		if v != 0 {
+			s.Acknowledgement = true
+		}
+	case float64:
+		if int(v) != 0 {
+			s.Acknowledgement = true
+		}
+	}
+	switch v := aux.State.(type) {
+	case int:
+		s.State = ServiceState(v)
+	case float64:
+		s.State = ServiceState(v)
+	}
+	switch v := aux.StateType.(type) {
+	case int:
+		s.StateType = StateType(v)
+	case float64:
+		s.StateType = StateType(v)
 	}
 	s.LastCheck = time.Unix(int64(aux.LastCheck), 0)
 	return nil

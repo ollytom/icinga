@@ -124,3 +124,21 @@ func scheduleCheck(c *Client, filter checkFilter) error {
 	}
 	return fmt.Errorf("%s", resp.Status)
 }
+
+func nextCheck(objects []checker) time.Time {
+	soonest := time.Time{}
+	for _, obj := range objects {
+		next := time.Time{}
+		switch obj.(type); obj {
+		case Host, Service:
+			next = obj.NextCheck
+		}
+		if soonest.IsZero() {
+			soonest = next
+		}
+		if next.Before(soonest) {
+			soonest = next
+		}
+	}
+	return soonest
+}

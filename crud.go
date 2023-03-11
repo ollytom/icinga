@@ -2,7 +2,10 @@
 
 package icinga
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+)
 
 // Hosts returns a slice of Host matching the filter expression filter.
 // If no hosts match, error wraps ErrNoMatch.
@@ -26,7 +29,7 @@ func (c *Client) Hosts(filter string) ([]Host, error) {
 // LookupHost returns the Host identified by name. If no Host is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupHost(name string) (Host, error) {
-	obj, err := c.lookupObject("/objects/hosts/" + name)
+	obj, err := c.lookupObject("/objects/hosts/" + url.PathEscape(name))
 	if err != nil {
 		return Host{}, fmt.Errorf("lookup host %s: %w", name, err)
 	}
@@ -50,7 +53,7 @@ func (c *Client) CreateHost(host Host) error {
 // depending on the Host are also deleted. If no Host is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteHost(name string, cascade bool) error {
-	if err := c.deleteObject("/objects/hosts/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/hosts/"+url.PathEscape(name), cascade); err != nil {
 		return fmt.Errorf("delete host %s: %w", name, err)
 	}
 	return nil
@@ -77,7 +80,7 @@ func (c *Client) Services(filter string) ([]Service, error) {
 // LookupService returns the Service identified by name. If no Service is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupService(name string) (Service, error) {
-	obj, err := c.lookupObject("/objects/services/" + name)
+	obj, err := c.lookupObject("/objects/services/" + url.PathEscape(name))
 	if err != nil {
 		return Service{}, fmt.Errorf("lookup service %s: %w", name, err)
 	}
@@ -101,7 +104,7 @@ func (c *Client) CreateService(service Service) error {
 // depending on the Service are also deleted. If no Service is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteService(name string, cascade bool) error {
-	if err := c.deleteObject("/objects/services/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/services/"+url.PathEscape(name), cascade); err != nil {
 		return fmt.Errorf("delete service %s: %w", name, err)
 	}
 	return nil
@@ -128,7 +131,7 @@ func (c *Client) Users(filter string) ([]User, error) {
 // LookupUser returns the User identified by name. If no User is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupUser(name string) (User, error) {
-	obj, err := c.lookupObject("/objects/users/" + name)
+	obj, err := c.lookupObject("/objects/users/" + url.PathEscape(name))
 	if err != nil {
 		return User{}, fmt.Errorf("lookup user %s: %w", name, err)
 	}
@@ -152,7 +155,7 @@ func (c *Client) CreateUser(user User) error {
 // depending on the User are also deleted. If no User is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteUser(name string, cascade bool) error {
-	if err := c.deleteObject("/objects/users/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/users/"+url.PathEscape(name), cascade); err != nil {
 		return fmt.Errorf("delete user %s: %w", name, err)
 	}
 	return nil
@@ -179,7 +182,7 @@ func (c *Client) HostGroups(filter string) ([]HostGroup, error) {
 // LookupHostGroup returns the HostGroup identified by name. If no HostGroup is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupHostGroup(name string) (HostGroup, error) {
-	obj, err := c.lookupObject("/objects/hostgroups/" + name)
+	obj, err := c.lookupObject("/objects/hostgroups/" + url.PathEscape(name))
 	if err != nil {
 		return HostGroup{}, fmt.Errorf("lookup hostgroup %s: %w", name, err)
 	}
@@ -203,7 +206,7 @@ func (c *Client) CreateHostGroup(hostgroup HostGroup) error {
 // depending on the HostGroup are also deleted. If no HostGroup is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteHostGroup(name string, cascade bool) error {
-	if err := c.deleteObject("/objects/hostgroups/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/hostgroups/"+url.PathEscape(name), cascade); err != nil {
 		return fmt.Errorf("delete hostgroup %s: %w", name, err)
 	}
 	return nil

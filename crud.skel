@@ -20,7 +20,7 @@ func (c *Client) TYPEs(filter string) ([]TYPE, error) {
 // LookupTYPE returns the TYPE identified by name. If no TYPE is found, error
 // wraps ErrNotExist.
 func (c *Client) LookupTYPE(name string) (TYPE, error) {
-	obj, err := c.lookupObject("/objects/PLURAL/" + name)
+	obj, err := c.lookupObject("/objects/PLURAL/" + url.PathEscape(name))
 	if err != nil {
 		return TYPE{}, fmt.Errorf("lookup LOWER %s: %w", name, err)
 	}
@@ -44,7 +44,7 @@ func (c *Client) CreateTYPE(LOWER TYPE) error {
 // depending on the TYPE are also deleted. If no TYPE is found, error wraps
 // ErrNotExist.
 func (c *Client) DeleteTYPE(name string, cascade bool) error {
-	if err := c.deleteObject("/objects/PLURAL/"+name, cascade); err != nil {
+	if err := c.deleteObject("/objects/PLURAL/"+url.PathEscape(name), cascade); err != nil {
 		return fmt.Errorf("delete LOWER %s: %w", name, err)
 	}
 	return nil

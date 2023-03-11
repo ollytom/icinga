@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://the.missing.style">
+	<link href="https://fonts.bunny.net/css?family=source-sans-3:400,700|m-plus-code-latin:400,700" rel="stylesheet">
+	<title>{{block "title" .}}checkweb{{end}}</title>
+
+	<style>
+.unknown {
+	--box-bg: lavender;
+	--accent: rebeccapurple;
+}
+	</style>
+</head>
+<body>
+<header class="navbar">
+<nav class="contents">
+<a href="/">checkweb</a>
+<a href="/objects/services">Services</a>
+<a href="/objects/hosts">Hosts</a>
+<form class="f-row" action="/search">
+	<input type="search" placeholder="Search" name="filter">
+	<select name="type">
+		<option value="service">Services</option>
+		<option value="servicegroup">Service Groups</option>
+		<option value="host">Hosts</option>
+		<option value="hostgroup">Host Groups</option>
+	</select>
+</form>
+	</li>
+</ul>
+</nav>
+</header>
+<main>
+	{{block "content" .}}Hello, checkweb!{{end}}
+</main>
+<footer>
+</footer>
+</body>
+</html>

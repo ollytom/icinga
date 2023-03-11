@@ -1,0 +1,10 @@
+{{define "title"}}Services{{end}}
+
+{{define "content"}}
+{{range .}}
+	<div class="f-row justify-content:space-between">
+		<a href="/objects/services/{{pathescape .Name}}">{{.DisplayName}} ({{.Name}})</a>
+		<chip class="{{if eq .State 0}}ok{{else if eq .State 1}}warn{{else if eq .State 2}}bad{{else}}unknown{{end}}">{{.State}}</chip>
+	</div>
+{{end}}
+{{end}}

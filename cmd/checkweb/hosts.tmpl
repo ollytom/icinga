@@ -1,0 +1,10 @@
+{{define "title"}}Hosts{{end}}
+
+{{define "content"}}
+{{range .}}
+	<div class="f-row justify-content:space-between">
+		<a href="/objects/hosts/{{.Name}}">{{.DisplayName}} ({{.Name}})</a>
+		<chip class="{{if eq .State 0}}ok{{else}}bad{{end}}">{{.State}}</chip>
+	</div>
+{{end}}
+{{end}}

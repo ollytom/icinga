@@ -1,0 +1,25 @@
+{{define "title"}}{{.Name}}{{end}}
+
+{{define "content"}}
+<h1>
+	{{.DisplayName}}
+	<sub-title>{{.Name}}</sub-title>
+</h1>
+<p>{{.Notes}}</p>
+<table>
+	<tr><th>Last check</th><td><time>{{.LastCheck}}</time></td></tr>
+	<tr>
+		<th>State</th>
+		<td>
+			<chip class="{{if eq .State 0}}ok{{else if eq .State 1}}warn{{else if eq .State 2}}bad{{else}}unknown{{end}}">{{.State}}</chip>
+			{{if .Acknowledgement}}<chip class="info">Acknowledged</chip>{{end}}
+		</td>
+	</tr>
+	<tr><th>CheckCommand</th><td>{{.CheckCommand}}</td></tr>
+	<tr><th>Raw command</th><td><code>{{.LastCheckResult.RawCommand}}</code></td></tr>
+</table>
+
+<figure>
+	<pre>{{.LastCheckResult.Output}}</pre>
+</figure>
+{{end}}

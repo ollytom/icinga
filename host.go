@@ -20,6 +20,8 @@ type Host struct {
 	LastCheck       time.Time   `json:",omitempty"`
 	LastCheckResult CheckResult `json:"last_check_result,omitempty"`
 	Acknowledgement bool        `json:",omitempty"`
+	Notes           string      `json:"notes,omitempty"`
+	NotesURL        string      `json:"notes_url,omitempty"`
 }
 
 type HostGroup struct {

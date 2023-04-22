@@ -40,9 +40,9 @@ const (
 func (state HostState) String() string {
 	switch state {
 	case HostUp:
-		return "HostUp"
+		return "Up"
 	case HostDown:
-		return "HostDown"
+		return "Down"
 	}
 	return "HostUnreachable"
 }

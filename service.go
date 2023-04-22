@@ -47,13 +47,13 @@ const (
 func (state ServiceState) String() string {
 	switch state {
 	case ServiceOK:
-		return "ServiceOK"
+		return "OK"
 	case ServiceWarning:
-		return "ServiceWarning"
+		return "Warning"
 	case ServiceCritical:
-		return "ServiceCritical"
+		return "Critical"
 	}
-	return "ServiceUnknown"
+	return "Unknown"
 }
 
 // UnmarshalJSON unmarshals service attributes into more meaningful Service field types.

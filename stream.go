@@ -41,7 +41,6 @@ func (c *Client) Subscribe(typ, queue, filter string) (<-chan Event, error) {
 	if err := json.NewEncoder(buf).Encode(m); err != nil {
 		return nil, fmt.Errorf("encode stream parameters: %w", err)
 	}
-	ch := make(chan Event)
 	resp, err := c.post("/events", buf)
 	if err != nil {
 		return nil, err
@@ -54,17 +53,18 @@ func (c *Client) Subscribe(typ, queue, filter string) (<-chan Event, error) {
 		return nil, fmt.Errorf("request events: %w", iresp.Error)
 	}
 	sc := bufio.NewScanner(resp.Body)
+	ch := make(chan Event)
 	go func() {
 		for sc.Scan() {
 			var ev Event
 			if err := json.Unmarshal(sc.Bytes(), &ev); err != nil {
-				ch <- Event{Error: fmt.Errorf("decode event: %w", err)}
+				ch <- Event{Error: fmt.Errorf("decode event: %v", err)}
 				continue
 			}
 			ch <- ev
 		}
 		if sc.Err() != nil {
-			ch <- Event{Error: fmt.Errorf("scan response: %w", err)}
+			ch <- Event{Error: fmt.Errorf("scan response: %w", sc.Err())}
 		}
 		resp.Body.Close()
 		close(ch)

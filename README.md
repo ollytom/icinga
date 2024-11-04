@@ -2,7 +2,7 @@ package icinga provides a client to the Icinga2 HTTP API.
 
 [![builds.sr.ht status](https://builds.sr.ht/~otl/icinga.svg)](https://builds.sr.ht/~otl/icinga?)
 
-[![godocs.io](http://godocs.io/olowe.co/icinga?status.svg)](http://godocs.io/olowe.co/icinga)
+[![godoc](http://pkg.go.dev/badge/olowe.co/icinga)](http://pkg.go.dev/olowe.co/icinga)
 
 Send patches, questions or a friendly "hello" to the mailing list: [~otl/public-inbox@lists.sr.ht](mailto:~otl/public-inbox@lists.sr.ht)
 Or, read [the archives][list].
